@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Local config
+local.properties
+
+# Android Studio
+.idea/
+*.iml
+.DS_Store
+
+# Logs and caches
+*.log
+.cache/
+captures/
+
+# Generated files
+*.apk
+*.ap_
+
