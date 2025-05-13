@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<LinearLayout
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:text="Select Days:"
+        android:textSize="18sp"
+        android:layout_marginBottom="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <CheckBox android:id="@+id/checkbox_mon" android:text="Monday" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <CheckBox android:id="@+id/checkbox_tue" android:text="Tuesday" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <CheckBox android:id="@+id/checkbox_wed" android:text="Wednesday" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <CheckBox android:id="@+id/checkbox_thu" android:text="Thursday" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <CheckBox android:id="@+id/checkbox_fri" android:text="Friday" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <CheckBox android:id="@+id/checkbox_sat" android:text="Saturday" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+    <CheckBox android:id="@+id/checkbox_sun" android:text="Sunday" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/start_time_btn"
+        android:text="Select Start Time"
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/end_time_btn"
+        android:text="Select End Time"
+        android:layout_marginTop="10dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/save_btn"
+        android:text="Save Schedule"
+        android:layout_marginTop="30dp"
+	android:background="@android:color/holo_blue_dark"
+        android:textColor="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>
+</ScrollView>

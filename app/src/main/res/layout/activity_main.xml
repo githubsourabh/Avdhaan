@@ -18,5 +18,13 @@
         android:text="Enable Focus Mode"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/schedule_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Set Focus Schedule"
+        android:layout_marginTop="24dp"/>
+
 </LinearLayout>
 
