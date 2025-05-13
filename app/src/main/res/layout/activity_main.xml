@@ -21,9 +21,16 @@
 
     <Button
         android:id="@+id/schedule_button"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Set Focus Schedule"
+        android:layout_marginTop="24dp"/>
+
+    <Button
+        android:id="@+id/btn_select_apps"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Apps to Block"
         android:layout_marginTop="24dp"/>
 
 </LinearLayout>

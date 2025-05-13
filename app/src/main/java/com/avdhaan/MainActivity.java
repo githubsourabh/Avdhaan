@@ -31,9 +31,12 @@ public class MainActivity extends Activity {
             startActivity(intent);
         });
 
+        Button selectAppsButton = findViewById(R.id.btn_select_apps);
+        selectAppsButton.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, SelectAppsActivity.class);
+            startActivity(intent);
+        });
 
-        Intent intent = new Intent(MainActivity.this, SelectAppsActivity.class);
-        startActivity(intent);
 
     }
 
