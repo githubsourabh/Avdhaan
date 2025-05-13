@@ -22,6 +22,13 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                 startActivity(intent);
             }
+
         });
+
+        Intent intent = new Intent(MainActivity.this, SelectAppsActivity.class);
+        startActivity(intent);
+
     }
+
+
 }
