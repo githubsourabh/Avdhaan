@@ -34,7 +34,10 @@
 
         <activity android:name=".SelectAppsActivity" />
 
+        <activity android:name=".ScheduleListActivity" />
+
         <activity android:name=".ScheduleActivity" />
+
 
 
 

@@ -27,8 +27,9 @@ public class MainActivity extends Activity {
 
         Button scheduleButton = findViewById(R.id.schedule_button);
         scheduleButton.setOnClickListener(v -> {
-            Intent intent = new Intent(MainActivity.this, ScheduleActivity.class);
+            Intent intent = new Intent(MainActivity.this, ScheduleListActivity.class);
             startActivity(intent);
+
         });
 
         Button selectAppsButton = findViewById(R.id.btn_select_apps);
