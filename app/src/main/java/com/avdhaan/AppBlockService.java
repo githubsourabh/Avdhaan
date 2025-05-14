@@ -15,27 +15,43 @@ public class AppBlockService extends AccessibilityService {
 
     private Set<String> blockedApps = new HashSet<>();
 
+    private boolean isFocusModeOn() {
+        return getSharedPreferences("FocusPrefs", MODE_PRIVATE)
+                .getBoolean("focusEnabled", false);
+    }
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
         loadBlockedApps();
+        Log.d("AppBlockService", "Service connected");
     }
 
     private void loadBlockedApps() {
         SharedPreferences prefs = getSharedPreferences("BlockedPrefs", MODE_PRIVATE);
         blockedApps = prefs.getStringSet("blockedApps", new HashSet<>());
+        if (blockedApps == null) blockedApps = new HashSet<>();
+    }
+
+    private boolean isFocusModeEnabled() {
+        SharedPreferences prefs = getSharedPreferences("BlockedPrefs", MODE_PRIVATE);
+        return prefs.getBoolean("focusModeEnabled", false);
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+
+        if (!isFocusModeOn()) return;
+
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
 
-        String packageName = String.valueOf(event.getPackageName());
+        if (!isFocusModeEnabled()) return;
 
+        String packageName = String.valueOf(event.getPackageName());
         if (!blockedApps.contains(packageName)) return;
+
         if (!isWithinFocusTime()) return;
 
-        if (BlockScreenActivity.isShowing) return; // Prevent multiple launches
+        if (BlockScreenActivity.isShowing) return;
 
         Log.d("AppBlockService", "Blocking app: " + packageName);
 

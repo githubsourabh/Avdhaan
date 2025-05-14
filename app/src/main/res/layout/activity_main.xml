@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:background="?android:attr/windowBackground" xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="?android:attr/windowBackground"
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
@@ -8,18 +9,20 @@
     android:layout_height="match_parent">
 
     <TextView
-    android:textColor="?android:attr/textColorPrimary"
         android:text="Welcome to Avdhaan!"
+        android:textColor="?android:attr/textColorPrimary"
         android:textSize="20sp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="16dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/open_accessibility"
-        android:text="Enable Focus Mode"
+    <Switch
+        android:id="@+id/focus_swtich"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Focus Mode"
+        android:layout_marginBottom="24dp"
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/schedule_button"
@@ -36,4 +39,3 @@
         android:layout_marginTop="24dp"/>
 
 </LinearLayout>
-
