@@ -25,6 +25,9 @@ public class ScheduleActivity extends AppCompatActivity {
     private TimePicker startTimePicker, endTimePicker;
     private GridLayout dayToggleGrid;
 
+    private int editingScheduleIndex = -1;
+    private FocusSchedule editingSchedule;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,8 +42,35 @@ public class ScheduleActivity extends AppCompatActivity {
                 ? (GridLayout) findViewById(R.id.toggleSun).getParent()
                 : null;
 
+        // Check for editing
+        editingScheduleIndex = getIntent().getIntExtra("editScheduleIndex", -1);
+        if (editingScheduleIndex != -1) {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            if (editingScheduleIndex >= 0 && editingScheduleIndex < schedules.size()) {
+                editingSchedule = schedules.get(editingScheduleIndex);
+                prefillSchedule(editingSchedule);
+            }
+        }
+
         Button saveBtn = findViewById(R.id.saveScheduleBtn);
         saveBtn.setOnClickListener(v -> saveSchedule());
+    }
+
+    private void prefillSchedule(FocusSchedule schedule) {
+        startTimePicker.setHour(schedule.getStartHour());
+        startTimePicker.setMinute(schedule.getStartMinute());
+        endTimePicker.setHour(schedule.getEndHour());
+        endTimePicker.setMinute(schedule.getEndMinute());
+
+        for (int i = 0; i < dayToggleGrid.getChildCount(); i++) {
+            ToggleButton toggle = (ToggleButton) dayToggleGrid.getChildAt(i);
+            int day = getDayOfWeekFromId(toggle.getId());
+            if (day == schedule.getDayOfWeek()) {
+                toggle.setChecked(true);
+            } else {
+                toggle.setChecked(false);
+            }
+        }
     }
 
     private void saveSchedule() {
@@ -64,12 +94,10 @@ public class ScheduleActivity extends AppCompatActivity {
         Calendar startCal = Calendar.getInstance();
         startCal.set(Calendar.HOUR_OF_DAY, startHour);
         startCal.set(Calendar.MINUTE, startMinute);
-        startCal.set(Calendar.SECOND, 0);
 
         Calendar endCal = Calendar.getInstance();
         endCal.set(Calendar.HOUR_OF_DAY, endHour);
         endCal.set(Calendar.MINUTE, endMinute);
-        endCal.set(Calendar.SECOND, 0);
 
         if (!endCal.after(startCal)) {
             Toast.makeText(this, "End time must be after start time", Toast.LENGTH_LONG).show();
@@ -77,21 +105,40 @@ public class ScheduleActivity extends AppCompatActivity {
         }
 
         boolean anyDaySelected = false;
-        List<FocusSchedule> currentSchedules = new ArrayList<>(ScheduleStorage.loadSchedules(this));
-
+        List<FocusSchedule> allSchedules = new ArrayList<>(ScheduleStorage.loadSchedules(this));
 
         for (int i = 0; i < dayToggleGrid.getChildCount(); i++) {
             ToggleButton toggle = (ToggleButton) dayToggleGrid.getChildAt(i);
-            if (toggle.isChecked()) {
-                anyDaySelected = true;
-                int dayOfWeek = getDayOfWeekFromId(toggle.getId());
+            if (!toggle.isChecked()) continue;
 
-                FocusSchedule schedule = new FocusSchedule(dayOfWeek, startHour, startMinute, endHour, endMinute);
-                currentSchedules.add(schedule);
+            anyDaySelected = true;
+            int dayOfWeek = getDayOfWeekFromId(toggle.getId());
 
-                scheduleAlarm(dayOfWeek, startHour, startMinute);
-                scheduleEndAlarm(dayOfWeek, endHour, endMinute);
+            // Remove existing schedule if editing
+            if (editingScheduleIndex != -1) {
+                allSchedules.remove(editingScheduleIndex);
             }
+
+            // Check for overlapping schedules
+            for (FocusSchedule existing : allSchedules) {
+                if (existing.getDayOfWeek() != dayOfWeek) continue;
+
+                int start1 = startHour * 60 + startMinute;
+                int end1 = endHour * 60 + endMinute;
+                int start2 = existing.getStartHour() * 60 + existing.getStartMinute();
+                int end2 = existing.getEndHour() * 60 + existing.getEndMinute();
+
+                if (Math.max(start1, start2) < Math.min(end1, end2)) {
+                    Toast.makeText(this, "Schedule overlaps with an existing one", Toast.LENGTH_LONG).show();
+                    return;
+                }
+            }
+
+            FocusSchedule newSchedule = new FocusSchedule(dayOfWeek, startHour, startMinute, endHour, endMinute);
+            allSchedules.add(newSchedule);
+
+            scheduleAlarm(dayOfWeek, startHour, startMinute);
+            scheduleEndAlarm(dayOfWeek, endHour, endMinute);
         }
 
         if (!anyDaySelected) {
@@ -99,9 +146,9 @@ public class ScheduleActivity extends AppCompatActivity {
             return;
         }
 
-        ScheduleStorage.saveSchedules(this, currentSchedules);
+        ScheduleStorage.saveSchedules(this, allSchedules);
         Toast.makeText(this, "Schedule saved successfully", Toast.LENGTH_SHORT).show();
-        finish();  // Return to previous screen
+        finish();
     }
 
     private void scheduleAlarm(int dayOfWeek, int hour, int minute) {

@@ -35,7 +35,7 @@
         android:backgroundTint="?android:attr/colorAccent" />
 
     <Button
-        android:id="@+id/btn_clear_all"
+        android:id="@+id/btn_clear_all_schedules"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Clear All Schedules"

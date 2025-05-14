@@ -34,7 +34,7 @@ public class ScheduleListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        Button clearAllButton = findViewById(R.id.btn_clear_all);
+        Button clearAllButton = findViewById(R.id.btn_clear_all_schedules);
         clearAllButton.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Clear All Schedules")
@@ -60,30 +60,40 @@ public class ScheduleListActivity extends AppCompatActivity {
     private void loadAndDisplaySchedules() {
         schedules = ScheduleStorage.loadSchedules(this);
 
+        Button clearAllBtn = findViewById(R.id.btn_clear_all_schedules);
+
         if (schedules.isEmpty()) {
             emptyText.setVisibility(View.VISIBLE);
             scheduleList.setVisibility(View.GONE);
-        } else {
-            emptyText.setVisibility(View.GONE);
-            scheduleList.setVisibility(View.VISIBLE);
+            clearAllBtn.setVisibility(View.GONE);  // 🔴 Hide button if no schedules
+            return;
         }
 
-        adapter = new ScheduleListAdapter(this, schedules, new ScheduleListAdapter.OnScheduleUpdated() {
-            @Override
-            public void onDelete(int position) {
-                showDeleteDialog(position);
-            }
+        emptyText.setVisibility(View.GONE);
+        scheduleList.setVisibility(View.VISIBLE);
+        clearAllBtn.setVisibility(View.VISIBLE);  // ✅ Show button if schedules exist
 
+        adapter = new ScheduleListAdapter(this, schedules, new ScheduleListAdapter.OnScheduleUpdated() {
             @Override
             public void onEdit(int position) {
                 Intent intent = new Intent(ScheduleListActivity.this, ScheduleActivity.class);
                 intent.putExtra("editScheduleIndex", position);
                 startActivity(intent);
             }
+
+            @Override
+            public void onDelete(int position) {
+                schedules.remove(position);
+                ScheduleStorage.saveSchedules(ScheduleListActivity.this, schedules);
+                adapter.notifyItemRemoved(position);
+                loadAndDisplaySchedules();  // Refresh after delete
+            }
         });
 
+        scheduleList.setLayoutManager(new LinearLayoutManager(this));
         scheduleList.setAdapter(adapter);
     }
+
 
     private void showDeleteDialog(int position) {
         new AlertDialog.Builder(this)
