@@ -1,6 +1,5 @@
 package com.avdhaan;
 
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +7,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.HashSet;
@@ -25,6 +25,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         this.appList = apps;
         this.onBlockedChanged = onBlockedChanged;
 
+        // Preload initially blocked apps
         for (AppInfo app : apps) {
             if (app.isBlocked) {
                 blockedPackages.add(app.packageName);
@@ -37,35 +38,33 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
         TextView name;
         CheckBox checkBox;
 
-        public ViewHolder(View view) {
-            super(view);
-            icon = view.findViewById(R.id.app_icon);
-            name = view.findViewById(R.id.app_name);
-            checkBox = view.findViewById(R.id.app_checkbox);
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            icon = itemView.findViewById(R.id.app_icon);
+            name = itemView.findViewById(R.id.app_name);
+            checkBox = itemView.findViewById(R.id.app_checkbox);
         }
     }
 
+    @NonNull
     @Override
-    public AppListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_app_row, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AppInfo app = appList.get(position);
 
         holder.icon.setImageDrawable(app.icon);
         holder.name.setText(app.name);
 
-        // 🚫 Prevent triggering old listeners
+        // Avoid recycling issues
         holder.checkBox.setOnCheckedChangeListener(null);
+        holder.checkBox.setChecked(blockedPackages.contains(app.packageName));
 
-        // ✅ Set checkbox state
-        holder.checkBox.setChecked(app.isBlocked);
-
-        // ✅ Now set listener
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             app.isBlocked = isChecked;
             if (isChecked) {
@@ -73,10 +72,9 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
             } else {
                 blockedPackages.remove(app.packageName);
             }
-            onBlockedChanged.accept(blockedPackages);
+            onBlockedChanged.accept(new HashSet<>(blockedPackages));
         });
     }
-
 
     @Override
     public int getItemCount() {

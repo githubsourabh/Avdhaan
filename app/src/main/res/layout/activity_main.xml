@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout
+    android:background="?android:attr/windowBackground" xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:padding="24dp"
     android:gravity="center"
@@ -7,6 +8,7 @@
     android:layout_height="match_parent">
 
     <TextView
+    android:textColor="?android:attr/textColorPrimary"
         android:text="Welcome to Avdhaan!"
         android:textSize="20sp"
         android:layout_marginBottom="24dp"

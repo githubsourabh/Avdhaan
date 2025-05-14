@@ -1,19 +1,14 @@
+
 package com.avdhaan;
 
-public class FocusSchedule {
-    private int dayOfWeek;
-    private int startHour;
-    private int startMinute;
-    private int endHour;
-    private int endMinute;
+import java.io.Serializable;
 
-    public FocusSchedule(int dayOfWeek, int startHour, int startMinute, int endHour, int endMinute) {
-        this.dayOfWeek = dayOfWeek;
-        this.startHour = startHour;
-        this.startMinute = startMinute;
-        this.endHour = endHour;
-        this.endMinute = endMinute;
-    }
+public class FocusSchedule implements Serializable {
+    public int dayOfWeek;
+    public int startHour;
+    public int startMinute;
+    public int endHour;
+    public int endMinute;
 
     public int getDayOfWeek() {
         return dayOfWeek;
@@ -35,9 +30,19 @@ public class FocusSchedule {
         return endMinute;
     }
 
-    @Override
-    public String toString() {
-        return String.format("Day %d: %02d:%02d - %02d:%02d",
-                dayOfWeek, startHour, startMinute, endHour, endMinute);
+    public FocusSchedule(int dayOfWeek, int startHour, int startMinute, int endHour, int endMinute) {
+        this.dayOfWeek = dayOfWeek;
+        this.startHour = startHour;
+        this.startMinute = startMinute;
+        this.endHour = endHour;
+        this.endMinute = endMinute;
+    }
+
+    public boolean matches(int day, int hour, int minute) {
+        if (day != dayOfWeek) return false;
+        int startTotal = startHour * 60 + startMinute;
+        int endTotal = endHour * 60 + endMinute;
+        int currentTotal = hour * 60 + minute;
+        return currentTotal >= startTotal && currentTotal <= endTotal;
     }
 }

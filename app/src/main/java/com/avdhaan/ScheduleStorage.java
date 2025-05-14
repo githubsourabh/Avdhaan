@@ -1,35 +1,31 @@
+
 package com.avdhaan;
 
 import android.content.Context;
-import android.content.SharedPreferences;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleStorage {
-    private static final String PREF_NAME = "FocusPrefs";
-    private static final String KEY_SCHEDULES = "FocusSchedules";
+    private static final String FILE_NAME = "focus_schedules.dat";
 
     public static void saveSchedules(Context context, List<FocusSchedule> schedules) {
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(schedules);
-        editor.putString(KEY_SCHEDULES, json);
-        editor.apply();
+        try (ObjectOutputStream out = new ObjectOutputStream(
+                new FileOutputStream(new File(context.getFilesDir(), FILE_NAME)))) {
+            out.writeObject(schedules);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static List<FocusSchedule> loadSchedules(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
-        String json = prefs.getString(KEY_SCHEDULES, null);
-        if (json == null) return new ArrayList<>();
-
-        Gson gson = new Gson();
-        Type listType = new TypeToken<List<FocusSchedule>>() {}.getType();
-        return gson.fromJson(json, listType);
+        File file = new File(context.getFilesDir(), FILE_NAME);
+        if (!file.exists()) return new ArrayList<>();
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file))) {
+            return (List<FocusSchedule>) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+            return new ArrayList<>();
+        }
     }
 }

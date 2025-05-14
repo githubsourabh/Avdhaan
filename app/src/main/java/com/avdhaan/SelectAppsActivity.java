@@ -8,7 +8,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -21,11 +20,12 @@ import java.util.Set;
 
 public class SelectAppsActivity extends AppCompatActivity {
 
+    private static final String PREFS_NAME = "BlockedPrefs";
+    private static final String BLOCKED_APPS_KEY = "blockedApps";
+
     private RecyclerView recyclerView;
     private AppListAdapter adapter;
     private Set<String> blockedApps = new HashSet<>();
-    private static final String PREFS_NAME = "BlockedPrefs";
-    private static final String BLOCKED_APPS_KEY = "blockedApps";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +41,16 @@ public class SelectAppsActivity extends AppCompatActivity {
 
     private void loadBlockedAppsFromPrefs() {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        blockedApps = prefs.getStringSet(BLOCKED_APPS_KEY, new HashSet<>());
+        Set<String> savedSet = prefs.getStringSet(BLOCKED_APPS_KEY, new HashSet<>());
+        // Defensive copy to prevent SharedPreferences from returning a mutable reference
+        blockedApps = new HashSet<>(savedSet);
+    }
+
+    private void saveBlockedAppsToPrefs() {
+        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit();
+        editor.putStringSet(BLOCKED_APPS_KEY, new HashSet<>(blockedApps));
+        editor.apply();
+        Toast.makeText(this, "Blocked apps updated", Toast.LENGTH_SHORT).show();
     }
 
     private void loadInstalledApps() {
@@ -53,31 +62,23 @@ public class SelectAppsActivity extends AppCompatActivity {
 
         for (ApplicationInfo app : installedApps) {
             if (pm.getLaunchIntentForPackage(app.packageName) != null &&
-                    !app.packageName.equals(currentPackage)) {  // ✅ exclude Avdhaan itself
+                    !app.packageName.equals(currentPackage)) {
 
                 String appName = pm.getApplicationLabel(app).toString();
                 Drawable icon = pm.getApplicationIcon(app);
                 boolean isBlocked = blockedApps.contains(app.packageName);
+
                 userApps.add(new AppInfo(appName, app.packageName, icon, isBlocked));
             }
         }
 
         Collections.sort(userApps, (a, b) -> a.name.compareToIgnoreCase(b.name));
 
-
-        adapter = new AppListAdapter(userApps, blocked -> {
-            blockedApps = blocked;
+        adapter = new AppListAdapter(userApps, updatedBlockedApps -> {
+            blockedApps = updatedBlockedApps;
             saveBlockedAppsToPrefs();
         });
 
         recyclerView.setAdapter(adapter);
     }
-
-    private void saveBlockedAppsToPrefs() {
-        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit();
-        editor.putStringSet(BLOCKED_APPS_KEY, blockedApps);
-        editor.apply();
-        Toast.makeText(this, "Blocked apps updated", Toast.LENGTH_SHORT).show();
-    }
 }
-

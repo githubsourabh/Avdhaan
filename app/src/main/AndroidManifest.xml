@@ -13,7 +13,7 @@
         android:label="Avdhaan"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
-        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
+        android:theme="@style/Theme.Avdhaan">
 
         <activity android:name=".MainActivity"
             android:exported="true">
