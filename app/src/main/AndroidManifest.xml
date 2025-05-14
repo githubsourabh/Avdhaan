@@ -6,6 +6,8 @@
         android:name="android.permission.QUERY_ALL_PACKAGES"
         tools:ignore="QueryAllPackagesPermission" />
 
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
 
     <application
         android:label="Avdhaan"
@@ -35,6 +37,7 @@
         <activity android:name=".ScheduleActivity" />
 
 
+
         <service
             android:name=".AppBlockService"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE"
@@ -48,6 +51,9 @@
         </service>
 
         <receiver android:name=".FocusAlarmReceiver" android:exported="true"/>
+
+        <receiver android:name=".FocusEndReceiver" android:exported="false" />
+
 
 
     </application>

@@ -1,86 +1,82 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp"
-    android:gravity="center_horizontal">
-
-    <TextView
-        android:id="@+id/scheduleStatus"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="No schedule set yet"
-        android:textSize="16sp"
-        android:layout_marginBottom="20dp" />
-
-    <TimePicker
-        android:id="@+id/timePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:timePickerMode="spinner"
-        android:layout_marginBottom="20dp" />
+    android:layout_height="match_parent">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:padding="16dp"
+        android:gravity="center_horizontal">
 
-        <ToggleButton
-            android:id="@+id/toggleSun"
+        <TextView
+            android:text="Start Time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="Sun"
-            android:textOff="Sun" />
-
-        <ToggleButton
-            android:id="@+id/toggleMon"
+            android:layout_marginTop="8dp"/>
+        <TimePicker
+            android:id="@+id/startTimePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="Mon"
-            android:textOff="Mon" />
+            android:timePickerMode="spinner" />
 
-        <ToggleButton
-            android:id="@+id/toggleTue"
+        <TextView
+            android:text="End Time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="Tue"
-            android:textOff="Tue" />
-
-        <ToggleButton
-            android:id="@+id/toggleWed"
+            android:layout_marginTop="16dp"/>
+        <TimePicker
+            android:id="@+id/endTimePicker"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="Wed"
-            android:textOff="Wed" />
+            android:timePickerMode="spinner" />
 
-        <ToggleButton
-            android:id="@+id/toggleThu"
+        <TextView
+            android:text="Repeat on:"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="Thu"
-            android:textOff="Thu" />
+            android:layout_marginTop="16dp" />
 
-        <ToggleButton
-            android:id="@+id/toggleFri"
+        <GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:columnCount="4"
+            android:alignmentMode="alignMargins"
+            android:rowCount="2"
+            android:rowOrderPreserved="false">
+
+            <ToggleButton android:id="@+id/toggleSun" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Sun" android:textOff="Sun" />
+            <ToggleButton android:id="@+id/toggleMon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Mon" android:textOff="Mon" />
+            <ToggleButton android:id="@+id/toggleTue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Tue" android:textOff="Tue" />
+            <ToggleButton android:id="@+id/toggleWed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Wed" android:textOff="Wed" />
+            <ToggleButton android:id="@+id/toggleThu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Thu" android:textOff="Thu" />
+            <ToggleButton android:id="@+id/toggleFri" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Fri" android:textOff="Fri" />
+            <ToggleButton android:id="@+id/toggleSat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Sat" android:textOff="Sat" />
+        </GridLayout>
+
+        <Button
+            android:id="@+id/saveScheduleBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="Fri"
-            android:textOff="Fri" />
+            android:text="Save Schedule"
+            android:layout_marginTop="24dp" />
 
-        <ToggleButton
-            android:id="@+id/toggleSat"
+        <TextView
+            android:id="@+id/scheduleStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="No schedule set yet"
+            android:textSize="14sp" />
+
+        <Button
+            android:id="@+id/clearScheduleBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOn="Sat"
-            android:textOff="Sat" />
+            android:text="Clear All Schedules"
+            android:layout_marginTop="20dp" />
+
     </LinearLayout>
-
-    <Button
-        android:id="@+id/saveScheduleBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Save Schedule"
-        android:layout_marginTop="20dp" />
-</LinearLayout>
+</ScrollView>
 
