@@ -35,6 +35,8 @@ public class AppBlockService extends AccessibilityService {
         if (!blockedApps.contains(packageName)) return;
         if (!isWithinFocusTime()) return;
 
+        if (BlockScreenActivity.isShowing) return; // Prevent multiple launches
+
         Log.d("AppBlockService", "Blocking app: " + packageName);
 
         Intent intent = new Intent(this, BlockScreenActivity.class);
