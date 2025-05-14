@@ -34,6 +34,20 @@ public class ScheduleListActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        Button clearAllButton = findViewById(R.id.btn_clear_all);
+        clearAllButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Clear All Schedules")
+                    .setMessage("Are you sure you want to delete all schedules?")
+                    .setPositiveButton("Yes", (dialog, which) -> {
+                        ScheduleStorage.saveSchedules(this, List.of());
+                        loadAndDisplaySchedules();
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+        });
+
+
         scheduleList.setLayoutManager(new LinearLayoutManager(this));
     }
 

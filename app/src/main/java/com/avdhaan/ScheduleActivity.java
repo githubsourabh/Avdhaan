@@ -7,10 +7,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.GridLayout;
-import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.ToggleButton;
 import android.widget.Toast;
@@ -22,14 +20,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-import com.avdhaan.FocusSchedule;
-import com.avdhaan.ScheduleStorage;
-
-
 public class ScheduleActivity extends AppCompatActivity {
 
     private TimePicker startTimePicker, endTimePicker;
-    private TextView scheduleStatus;
     private GridLayout dayToggleGrid;
 
     @Override
@@ -39,22 +32,15 @@ public class ScheduleActivity extends AppCompatActivity {
 
         startTimePicker = findViewById(R.id.startTimePicker);
         endTimePicker = findViewById(R.id.endTimePicker);
-
         startTimePicker.setIs24HourView(false);
         endTimePicker.setIs24HourView(false);
 
-        scheduleStatus = findViewById(R.id.scheduleStatus);
         dayToggleGrid = findViewById(R.id.toggleSun).getParent() instanceof GridLayout
                 ? (GridLayout) findViewById(R.id.toggleSun).getParent()
                 : null;
 
         Button saveBtn = findViewById(R.id.saveScheduleBtn);
         saveBtn.setOnClickListener(v -> saveSchedule());
-
-        displaySavedSchedules();
-
-        Button clearBtn = findViewById(R.id.clearScheduleBtn);
-        clearBtn.setOnClickListener(v -> clearAllSchedules());
     }
 
     private void saveSchedule() {
@@ -91,9 +77,8 @@ public class ScheduleActivity extends AppCompatActivity {
         }
 
         boolean anyDaySelected = false;
-        StringBuilder summary = new StringBuilder("Focus Mode Scheduled:\n");
+        List<FocusSchedule> currentSchedules = new ArrayList<>(ScheduleStorage.loadSchedules(this));
 
-        List<FocusSchedule> currentSchedules = ScheduleStorage.loadSchedules(this);
 
         for (int i = 0; i < dayToggleGrid.getChildCount(); i++) {
             ToggleButton toggle = (ToggleButton) dayToggleGrid.getChildAt(i);
@@ -104,11 +89,8 @@ public class ScheduleActivity extends AppCompatActivity {
                 FocusSchedule schedule = new FocusSchedule(dayOfWeek, startHour, startMinute, endHour, endMinute);
                 currentSchedules.add(schedule);
 
-                summary.append(toggle.getText()).append(" ")
-                        .append(String.format(Locale.getDefault(), "%02d:%02d", startHour, startMinute))
-                        .append(" to ")
-                        .append(String.format(Locale.getDefault(), "%02d:%02d", endHour, endMinute))
-                        .append("\n");
+                scheduleAlarm(dayOfWeek, startHour, startMinute);
+                scheduleEndAlarm(dayOfWeek, endHour, endMinute);
             }
         }
 
@@ -118,7 +100,8 @@ public class ScheduleActivity extends AppCompatActivity {
         }
 
         ScheduleStorage.saveSchedules(this, currentSchedules);
-        scheduleStatus.setText(summary.toString());
+        Toast.makeText(this, "Schedule saved successfully", Toast.LENGTH_SHORT).show();
+        finish();  // Return to previous screen
     }
 
     private void scheduleAlarm(int dayOfWeek, int hour, int minute) {
@@ -193,57 +176,5 @@ public class ScheduleActivity extends AppCompatActivity {
         else if (id == R.id.toggleFri) return Calendar.FRIDAY;
         else if (id == R.id.toggleSat) return Calendar.SATURDAY;
         else return -1;
-    }
-
-    private void displaySavedSchedules() {
-        List<FocusSchedule> savedSchedules = ScheduleStorage.loadSchedules(this);
-
-        if (savedSchedules.isEmpty()) {
-            scheduleStatus.setText("No schedule set yet");
-            return;
-        }
-
-        StringBuilder summary = new StringBuilder("Saved Schedules:\n");
-        for (FocusSchedule schedule : savedSchedules) {
-            String dayName = getDayName(schedule.getDayOfWeek());
-            String start = String.format(Locale.getDefault(), "%02d:%02d", schedule.getStartHour(), schedule.getStartMinute());
-            String end = String.format(Locale.getDefault(), "%02d:%02d", schedule.getEndHour(), schedule.getEndMinute());
-            summary.append(dayName).append(": ").append(start).append(" - ").append(end).append("\n");
-        }
-
-        scheduleStatus.setText(summary.toString());
-    }
-
-    private String getDayName(int dayOfWeek) {
-        switch (dayOfWeek) {
-            case Calendar.SUNDAY: return "Sunday";
-            case Calendar.MONDAY: return "Monday";
-            case Calendar.TUESDAY: return "Tuesday";
-            case Calendar.WEDNESDAY: return "Wednesday";
-            case Calendar.THURSDAY: return "Thursday";
-            case Calendar.FRIDAY: return "Friday";
-            case Calendar.SATURDAY: return "Saturday";
-            default: return "Unknown";
-        }
-    }
-
-    private void clearAllSchedules() {
-        List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-
-        for (FocusSchedule schedule : schedules) {
-            Intent startIntent = new Intent(this, FocusAlarmReceiver.class);
-            PendingIntent startPending = PendingIntent.getBroadcast(this, schedule.getDayOfWeek(), startIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            alarmManager.cancel(startPending);
-
-            Intent endIntent = new Intent(this, FocusEndReceiver.class);
-            PendingIntent endPending = PendingIntent.getBroadcast(this, 1000 + schedule.getDayOfWeek(), endIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
-            alarmManager.cancel(endPending);
-        }
-
-        ScheduleStorage.saveSchedules(this, new ArrayList<>());
-        scheduleStatus.setText("All schedules cleared.");
     }
 }

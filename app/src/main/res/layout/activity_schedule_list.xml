@@ -33,4 +33,12 @@
         android:text="Add New Schedule"
         android:layout_marginTop="16dp"
         android:backgroundTint="?android:attr/colorAccent" />
+
+    <Button
+        android:id="@+id/btn_clear_all"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear All Schedules"
+        android:layout_marginTop="16dp" />
+
 </LinearLayout>

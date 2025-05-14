@@ -67,20 +67,13 @@
             android:layout_marginTop="24dp" />
 
         <TextView
-    android:textColor="?android:attr/textColorPrimary"
+            android:textColor="?android:attr/textColorPrimary"
             android:id="@+id/scheduleStatus"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:text="No schedule set yet"
             android:textSize="14sp" />
-
-        <Button
-            android:id="@+id/clearScheduleBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Clear All Schedules"
-            android:layout_marginTop="20dp" />
 
     </LinearLayout>
 </ScrollView>
