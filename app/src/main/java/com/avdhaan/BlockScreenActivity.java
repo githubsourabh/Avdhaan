@@ -42,7 +42,7 @@ public class BlockScreenActivity extends Activity {
                 }
                 @Override public void onActivityCreated(@NonNull android.app.Activity a, Bundle b) {}
                 @Override public void onActivityStarted(@NonNull android.app.Activity a) {}
-                @Override public void onActivityStopped(android.app.Activity a) {}
+                @Override public void onActivityStopped(@NonNull android.app.Activity a) {}
                 @Override public void onActivitySaveInstanceState(@NonNull android.app.Activity a, @NonNull Bundle b) {}
                 @Override public void onActivityDestroyed(@NonNull android.app.Activity a) {}
             });
