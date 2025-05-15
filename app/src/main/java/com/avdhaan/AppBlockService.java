@@ -1,8 +1,10 @@
 package com.avdhaan;
 
 import android.accessibilityservice.AccessibilityService;
+import android.app.ActivityManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
@@ -14,11 +16,10 @@ import java.util.Set;
 public class AppBlockService extends AccessibilityService {
 
     private Set<String> blockedApps = new HashSet<>();
+    private String lastBlockedPackage = "";
+    private long lastBlockTimestamp = 0;
+    private static final long BLOCK_THRESHOLD_MS = 1500;
 
-    private boolean isFocusModeOn() {
-        return getSharedPreferences("FocusPrefs", MODE_PRIVATE)
-                .getBoolean("focusEnabled", false);
-    }
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
@@ -29,24 +30,39 @@ public class AppBlockService extends AccessibilityService {
     private void loadBlockedApps() {
         SharedPreferences prefs = getSharedPreferences("BlockedPrefs", MODE_PRIVATE);
         blockedApps = prefs.getStringSet("blockedApps", new HashSet<>());
-        if (blockedApps == null) blockedApps = new HashSet<>();
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-
-        if (!isFocusModeOn()) return;
-
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
-        
+
         String packageName = String.valueOf(event.getPackageName());
         if (!blockedApps.contains(packageName)) return;
-
         if (!isWithinFocusTime()) return;
 
-        if (BlockScreenActivity.isShowing) return;
+        long now = System.currentTimeMillis();
+
+        // Avoid repeated blocking of the same app within short time
+        if (packageName.equals(lastBlockedPackage) && now - lastBlockTimestamp < BLOCK_THRESHOLD_MS) {
+            return;
+        }
+
+        // Android 10+ fix using ActivityManager (replaces BlockScreenActivity static flag)
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            ActivityManager am = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+            if (am != null && !am.getRunningTasks(1).isEmpty()) {
+                ActivityManager.RunningTaskInfo taskInfo = am.getRunningTasks(1).get(0);
+                if (taskInfo.topActivity != null &&
+                        taskInfo.topActivity.getClassName().equals(BlockScreenActivity.class.getName())) {
+                    return;
+                }
+            }
+        }
 
         Log.d("AppBlockService", "Blocking app: " + packageName);
+
+        lastBlockedPackage = packageName;
+        lastBlockTimestamp = now;
 
         Intent intent = new Intent(this, BlockScreenActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
