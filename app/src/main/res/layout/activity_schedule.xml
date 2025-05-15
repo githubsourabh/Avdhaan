@@ -66,15 +66,6 @@
             android:text="Save Schedule"
             android:layout_marginTop="24dp" />
 
-        <TextView
-            android:textColor="?android:attr/textColorPrimary"
-            android:id="@+id/scheduleStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="No schedule set yet"
-            android:textSize="14sp" />
-
     </LinearLayout>
 </ScrollView>
 
