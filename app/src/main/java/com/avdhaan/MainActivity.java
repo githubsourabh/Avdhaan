@@ -1,13 +1,15 @@
+
 package com.avdhaan;
 
 import android.app.Activity;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.Toast;
-import android.content.SharedPreferences;
 
 public class MainActivity extends Activity {
 
@@ -26,10 +28,18 @@ public class MainActivity extends Activity {
         Button scheduleButton = findViewById(R.id.schedule_button);
         Button selectAppsButton = findViewById(R.id.btn_select_apps);
 
-        // Initial state load
         boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .getBoolean(KEY_FOCUS_MODE, false);
-        focusSwitch.setChecked(isFocusOn);
+
+        if (isAccessibilityEnabled()) {
+            focusSwitch.setChecked(isFocusOn);
+        } else {
+            focusSwitch.setChecked(false);
+            if (isFocusOn) {
+                saveFocusModeState(false);
+                Toast.makeText(this, "Accessibility service is disabled. Focus Mode turned off.", Toast.LENGTH_SHORT).show();
+            }
+        }
 
         focusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
@@ -49,13 +59,13 @@ public class MainActivity extends Activity {
             }
         });
 
-        scheduleButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, ScheduleListActivity.class));
-        });
+        scheduleButton.setOnClickListener(v ->
+                startActivity(new Intent(this, ScheduleListActivity.class))
+        );
 
-        selectAppsButton.setOnClickListener(v -> {
-            startActivity(new Intent(this, SelectAppsActivity.class));
-        });
+        selectAppsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, SelectAppsActivity.class))
+        );
     }
 
     @Override
@@ -66,27 +76,28 @@ public class MainActivity extends Activity {
         boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .getBoolean(KEY_FOCUS_MODE, false);
 
-        // If user requested to enable focus mode and has now enabled accessibility
         if (requestedEnable && isAccessibilityOn) {
             focusSwitch.setChecked(true);
             saveFocusModeState(true);
             Toast.makeText(this, "Focus Mode Enabled", Toast.LENGTH_SHORT).show();
             requestedEnable = false;
+        } else if (!isAccessibilityOn && isFocusOn) {
+            focusSwitch.setChecked(false);
+            saveFocusModeState(false);
+            Toast.makeText(this, "Accessibility service is disabled. Focus Mode turned off.", Toast.LENGTH_SHORT).show();
         } else {
             focusSwitch.setChecked(isFocusOn);
         }
     }
 
     private boolean isAccessibilityEnabled() {
-        String expectedComponent = new android.content.ComponentName(this, AppBlockService.class)
-                .flattenToString();
+        String expectedComponent = new ComponentName(this, AppBlockService.class).flattenToString();
         String enabledServices = Settings.Secure.getString(
                 getContentResolver(),
                 Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
         );
         return enabledServices != null && enabledServices.contains(expectedComponent);
     }
-
 
     private void saveFocusModeState(boolean enabled) {
         SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();

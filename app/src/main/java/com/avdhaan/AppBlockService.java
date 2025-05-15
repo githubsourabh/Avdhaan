@@ -32,20 +32,13 @@ public class AppBlockService extends AccessibilityService {
         if (blockedApps == null) blockedApps = new HashSet<>();
     }
 
-    private boolean isFocusModeEnabled() {
-        SharedPreferences prefs = getSharedPreferences("BlockedPrefs", MODE_PRIVATE);
-        return prefs.getBoolean("focusModeEnabled", false);
-    }
-
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
 
         if (!isFocusModeOn()) return;
 
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
-
-        if (!isFocusModeEnabled()) return;
-
+        
         String packageName = String.valueOf(event.getPackageName());
         if (!blockedApps.contains(packageName)) return;
 
