@@ -37,8 +37,8 @@ public class ScheduleListActivity extends AppCompatActivity {
         Button clearAllButton = findViewById(R.id.btn_clear_all_schedules);
         clearAllButton.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
-                    .setTitle("Clear All Schedules")
-                    .setMessage("Are you sure you want to delete all schedules?")
+                    .setTitle(R.string.BTN_CLR_ALL_SCH)
+                    .setMessage(R.string.TXT_CONF_DEL_ALL_SCH)
                     .setPositiveButton("Yes", (dialog, which) -> {
                         ScheduleStorage.saveSchedules(this, List.of());
                         loadAndDisplaySchedules();
@@ -97,15 +97,15 @@ public class ScheduleListActivity extends AppCompatActivity {
 
     private void showDeleteDialog(int position) {
         new AlertDialog.Builder(this)
-                .setTitle("Delete Schedule")
-                .setMessage("Are you sure you want to delete this schedule?")
+                .setTitle(getString(R.string.delete_schedule))
+                .setMessage(getString(R.string.delete_schedule_confirm))
                 .setPositiveButton("Delete", (dialog, which) -> {
                     schedules.remove(position);
                     ScheduleStorage.saveSchedules(this, schedules);
                     adapter.notifyItemRemoved(position);
                     loadAndDisplaySchedules();
                 })
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .show();
     }
 }

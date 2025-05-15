@@ -44,18 +44,18 @@ public class MainActivity extends Activity {
         focusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 if (!isAccessibilityEnabled()) {
-                    Toast.makeText(this, "Please enable accessibility service for Avdhaan", Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, getString(R.string.please_enable_accessibility), Toast.LENGTH_LONG).show();
                     requestedEnable = true;
                     focusSwitch.setChecked(false);
                     Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                     startActivity(intent);
                 } else {
                     saveFocusModeState(true);
-                    Toast.makeText(this, "Focus Mode Enabled", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, getString(R.string.focus_mode_enabled), Toast.LENGTH_SHORT).show();
                 }
             } else {
                 saveFocusModeState(false);
-                Toast.makeText(this, "Focus Mode Disabled", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, getString(R.string.focus_mode_disabled), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -79,7 +79,7 @@ public class MainActivity extends Activity {
         if (requestedEnable && isAccessibilityOn) {
             focusSwitch.setChecked(true);
             saveFocusModeState(true);
-            Toast.makeText(this, "Focus Mode Enabled", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, getString(R.string.focus_mode_enabled), Toast.LENGTH_SHORT).show();
             requestedEnable = false;
         } else if (!isAccessibilityOn && isFocusOn) {
             focusSwitch.setChecked(false);

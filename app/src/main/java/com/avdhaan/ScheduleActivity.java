@@ -100,7 +100,7 @@ public class ScheduleActivity extends AppCompatActivity {
         endCal.set(Calendar.MINUTE, endMinute);
 
         if (!endCal.after(startCal)) {
-            Toast.makeText(this, "End time must be after start time", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.end_time_must_be_after_start), Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -142,12 +142,12 @@ public class ScheduleActivity extends AppCompatActivity {
         }
 
         if (!anyDaySelected) {
-            Toast.makeText(this, "Select at least one day", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, getString(R.string.select_at_least_one_day), Toast.LENGTH_LONG).show();
             return;
         }
 
         ScheduleStorage.saveSchedules(this, allSchedules);
-        Toast.makeText(this, "Schedule saved successfully", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, getString(R.string.schedule_saved), Toast.LENGTH_SHORT).show();
         finish();
     }
 

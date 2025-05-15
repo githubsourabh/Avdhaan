@@ -9,7 +9,7 @@
     android:layout_height="match_parent">
 
     <TextView
-        android:text="Welcome to Avdhaan!"
+        android:text="@string/WELCOME_MSG"
         android:textColor="?android:attr/textColorPrimary"
         android:textSize="20sp"
         android:layout_marginBottom="16dp"
@@ -20,7 +20,7 @@
         android:id="@+id/focus_swtich"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Focus Mode"
+        android:text="@string/SWITCH_FOCUS_MODE"
         android:layout_marginBottom="24dp"
         android:textSize="16sp" />
 
@@ -28,14 +28,14 @@
         android:id="@+id/schedule_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Set Focus Schedule"
+        android:text="@string/BTN_SET_FOCUS_SCH"
         android:layout_marginTop="24dp"/>
 
     <Button
         android:id="@+id/btn_select_apps"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Select Apps to Block"
+        android:text="@string/BTN_SELECT_APPS_TO_BLK"
         android:layout_marginTop="24dp"/>
 
 </LinearLayout>

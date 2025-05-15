@@ -1,4 +1,60 @@
 <resources>
     <string name="app_name">Avdhaan</string>
     <string name="accessibility_service_description">Avdhaan helps you stay focused by blocking distracting apps.</string>
+    <string name="please_enable_accessibility">Please enable accessibility service for Avdhaan</string>
+    <string name="focus_mode_enabled">Focus Mode Enabled</string>
+    <string name="focus_mode_disabled">Focus Mode Disabled</string>
+    <string name="end_time_must_be_after_start">End time must be after start time</string>
+    <string name="select_at_least_one_day">Select at least one day</string>
+    <string name="schedule_saved">Schedule saved successfully</string>
+    <string name="delete_schedule">Delete Schedule</string>
+    <string name="delete_schedule_confirm">Are you sure you want to delete this schedule?</string>
+    <string name="cancel">Cancel</string>
+    <string name="BTN_SET_FOCUS_SCH">Set Focus Schedule</string>
+    <string name="WELCOME_MSG">Welcome to Avdhaan!</string>
+
+    <string name="TXT_CONF_DEL_ALL_SCH">Are you sure you want to delete all schedules?</string>
+    <string name="BTN_CLR_ALL_SCH">Clear All Schedules</string>
+    <string name="friday">Friday</string>
+    <string name="monday">Monday</string>
+    <string name="no">No</string>
+    <string name="pm">PM</string>
+    <string name="saturday">Saturday</string>
+    <string name="schedule_overlaps_with_an_existing_one">Schedule overlaps with an existing one</string>
+    <string name="service_interrupted">Service Interrupted</string>
+    <string name="service_connected">Service connected</string>
+    <string name="sunday">Sunday</string>
+    <string name="thursday">Thursday</string>
+    <string name="tuesday">Tuesday</string>
+    <string name="unknown">Unknown</string>
+    <string name="wednesday">Wednesday</string>
+    <string name="yes">Yes</string>
+    <string name="blockedapps">blockedApps</string>
+    <string name="day">day</string>
+    <string name="editscheduleindex">editScheduleIndex</string>
+    <string name="focusenabled">focusEnabled</string>
+    <string name="focusmodeenabled">focusModeEnabled</string>
+    <string name="focus_schedules_dat">focus_schedules.dat</string>
+
+    <string name="BTN_ADD_SCH">Add New Schedule</string>
+    <string name="NO_SCHEDULES_YET">No schedules yet</string>
+    <string name="APP_BLOCKED_MSG">🚫 This app is blocked by Avdhaan</string>
+    <string name="BTN_GO_BACK">Go Back</string>
+    <string name="SWITCH_FOCUS_MODE">Focus Mode</string>
+    <string name="BTN_SELECT_APPS_TO_BLK">Select Apps to Block</string>
+    <string name="TXTVIEW_START_TIME">Start Time</string>
+    <string name="TXTVIEW_END_TIME">End Time</string>
+    <string name="TXTVIEW_REPEAT_ON">Repeat on:</string>
+    <string name="BTN_SAVE_SCH">Save Schedule</string>
+
+    <string name="TGL_SUN">Sun</string>
+    <string name="TGL_MON">Mon</string>
+    <string name="TGL_TUE">Tue</string>
+    <string name="TGL_WED">Wed</string>
+    <string name="TGL_THU">Thu</string>
+    <string name="TGL_FRI">Fri</string>
+    <string name="TGL_SAT">SAT</string>
+
+
+
 </resources>

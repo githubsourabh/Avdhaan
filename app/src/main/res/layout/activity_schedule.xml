@@ -13,7 +13,7 @@
 
         <TextView
     android:textColor="?android:attr/textColorPrimary"
-            android:text="Start Time"
+            android:text="@string/TXTVIEW_START_TIME"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"/>
@@ -25,7 +25,7 @@
 
         <TextView
     android:textColor="?android:attr/textColorPrimary"
-            android:text="End Time"
+            android:text="@string/TXTVIEW_END_TIME"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"/>
@@ -37,7 +37,7 @@
 
         <TextView
     android:textColor="?android:attr/textColorPrimary"
-            android:text="Repeat on:"
+            android:text="@string/TXTVIEW_REPEAT_ON"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp" />
@@ -50,20 +50,20 @@
             android:rowCount="2"
             android:rowOrderPreserved="false">
 
-            <ToggleButton android:id="@+id/toggleSun" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Sun" android:textOff="Sun" />
-            <ToggleButton android:id="@+id/toggleMon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Mon" android:textOff="Mon" />
-            <ToggleButton android:id="@+id/toggleTue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Tue" android:textOff="Tue" />
-            <ToggleButton android:id="@+id/toggleWed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Wed" android:textOff="Wed" />
-            <ToggleButton android:id="@+id/toggleThu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Thu" android:textOff="Thu" />
-            <ToggleButton android:id="@+id/toggleFri" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Fri" android:textOff="Fri" />
-            <ToggleButton android:id="@+id/toggleSat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="Sat" android:textOff="Sat" />
+            <ToggleButton android:id="@+id/toggleSun" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="@string/TGL_SUN" android:textOff="@string/TGL_SUN" />
+            <ToggleButton android:id="@+id/toggleMon" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="@string/TGL_MON" android:textOff="@string/TGL_MON" />
+            <ToggleButton android:id="@+id/toggleTue" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="@string/TGL_TUE" android:textOff="@string/TGL_TUE" />
+            <ToggleButton android:id="@+id/toggleWed" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="@string/TGL_WED" android:textOff="@string/TGL_WED" />
+            <ToggleButton android:id="@+id/toggleThu" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="@string/TGL_THU" android:textOff="@string/TGL_THU" />
+            <ToggleButton android:id="@+id/toggleFri" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="@string/TGL_FRI" android:textOff="@string/TGL_FRI" />
+            <ToggleButton android:id="@+id/toggleSat" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textOn="@string/TGL_SAT" android:textOff="@string/TGL_SAT" />
         </GridLayout>
 
         <Button
             android:id="@+id/saveScheduleBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Save Schedule"
+            android:text= "@string/BTN_SAVE_SCH"
             android:layout_marginTop="24dp" />
 
     </LinearLayout>

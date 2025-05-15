@@ -10,7 +10,7 @@
         android:id="@+id/empty_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No schedules yet."
+        android:text="@string/NO_SCHEDULES_YET"
         android:textSize="16sp"
         android:gravity="center"
         android:visibility="gone"
@@ -30,7 +30,7 @@
         android:id="@+id/btn_add_schedule"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add New Schedule"
+        android:text="@string/BTN_ADD_SCH"
         android:layout_marginTop="16dp"
         android:backgroundTint="?android:attr/colorAccent" />
 
@@ -38,7 +38,7 @@
         android:id="@+id/btn_clear_all_schedules"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Clear All Schedules"
+        android:text="@string/BTN_CLR_ALL_SCH"
         android:layout_marginTop="16dp" />
 
 </LinearLayout>
