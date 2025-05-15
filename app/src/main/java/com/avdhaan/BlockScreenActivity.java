@@ -28,6 +28,25 @@ public class BlockScreenActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            getApplication().registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
+                @Override public void onActivityResumed(android.app.Activity activity) {
+                    if (activity instanceof BlockScreenActivity) {
+                        BlockScreenActivity.isShowing = true;
+                    }
+                }
+                @Override public void onActivityPaused(android.app.Activity activity) {
+                    if (activity instanceof BlockScreenActivity) {
+                        BlockScreenActivity.isShowing = false;
+                    }
+                }
+                @Override public void onActivityCreated(android.app.Activity a, Bundle b) {}
+                @Override public void onActivityStarted(android.app.Activity a) {}
+                @Override public void onActivityStopped(android.app.Activity a) {}
+                @Override public void onActivitySaveInstanceState(android.app.Activity a, Bundle b) {}
+                @Override public void onActivityDestroyed(android.app.Activity a) {}
+            });
+        }
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_block_screen);
