@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.WindowManager;
-import com.avdhaan.R;
 
 import android.widget.Button;
-import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 
 public class BlockScreenActivity extends Activity {
 
@@ -30,21 +30,21 @@ public class BlockScreenActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             getApplication().registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
-                @Override public void onActivityResumed(android.app.Activity activity) {
+                @Override public void onActivityResumed(@NonNull android.app.Activity activity) {
                     if (activity instanceof BlockScreenActivity) {
                         BlockScreenActivity.isShowing = true;
                     }
                 }
-                @Override public void onActivityPaused(android.app.Activity activity) {
+                @Override public void onActivityPaused(@NonNull android.app.Activity activity) {
                     if (activity instanceof BlockScreenActivity) {
                         BlockScreenActivity.isShowing = false;
                     }
                 }
-                @Override public void onActivityCreated(android.app.Activity a, Bundle b) {}
-                @Override public void onActivityStarted(android.app.Activity a) {}
+                @Override public void onActivityCreated(@NonNull android.app.Activity a, Bundle b) {}
+                @Override public void onActivityStarted(@NonNull android.app.Activity a) {}
                 @Override public void onActivityStopped(android.app.Activity a) {}
-                @Override public void onActivitySaveInstanceState(android.app.Activity a, Bundle b) {}
-                @Override public void onActivityDestroyed(android.app.Activity a) {}
+                @Override public void onActivitySaveInstanceState(@NonNull android.app.Activity a, @NonNull Bundle b) {}
+                @Override public void onActivityDestroyed(@NonNull android.app.Activity a) {}
             });
         }
         super.onCreate(savedInstanceState);
