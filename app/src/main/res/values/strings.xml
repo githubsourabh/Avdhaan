@@ -55,6 +55,8 @@
     <string name="TGL_FRI">Fri</string>
     <string name="TGL_SAT">SAT</string>
 
+    <string name="MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG">Accessibility service is disabled. Focus Mode turned off.</string>
+
 
 
 </resources>

@@ -37,7 +37,7 @@ public class MainActivity extends Activity {
             focusSwitch.setChecked(false);
             if (isFocusOn) {
                 saveFocusModeState(false);
-                Toast.makeText(this, "Accessibility service is disabled. Focus Mode turned off.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
         } else if (!isAccessibilityOn && isFocusOn) {
             focusSwitch.setChecked(false);
             saveFocusModeState(false);
-            Toast.makeText(this, "Accessibility service is disabled. Focus Mode turned off.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
         } else {
             focusSwitch.setChecked(isFocusOn);
         }
