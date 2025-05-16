@@ -2,6 +2,7 @@
 package com.avdhaan;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
@@ -39,7 +40,7 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
     public void onBindViewHolder(@NonNull AppUsageAdapter.ViewHolder holder, int position) {
         AppUsage usage = usageList.get(position);
 
-        holder.appName.setText(usage.packageName);
+        holder.appName.setText(getAppName(context, usage.packageName));
         holder.usageDuration.setText(formatDuration(usage.usageTimeMillis));
 
         try {
@@ -74,4 +75,15 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
         long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMillis) % 60;
         return String.format("%d min %02d sec", minutes, seconds);
     }
+
+    private String getAppName(Context context, String packageName) {
+        try {
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo appInfo = pm.getApplicationInfo(packageName, 0);
+            return pm.getApplicationLabel(appInfo).toString();
+        } catch (PackageManager.NameNotFoundException e) {
+            return packageName; // fallback
+        }
+    }
+
 }
