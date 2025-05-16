@@ -56,7 +56,7 @@ public class AppUsageLogger {
                         if (usageDuration < MIN_USAGE_THRESHOLD_MS) continue;
                         if (isSystemApp(packageName) || packageName.equals(context.getPackageName())) continue;
 
-                        Log.d("AppUsageLogger", "Logging " + packageName + " for " + usageDuration + "ms");
+                        //Log.d("AppUsageLogger", "Logging " + packageName + " for " + usageDuration + "ms");
 
                         AppUsage usage = new AppUsage(
                                 packageName,

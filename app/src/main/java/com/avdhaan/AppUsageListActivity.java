@@ -40,7 +40,6 @@ public class AppUsageListActivity extends AppCompatActivity {
 
         Executors.newSingleThreadExecutor().execute(() -> {
             AppDatabase db = AppDatabase.getInstance(this);
-            db.appUsageDao().insert(new AppUsage("com.test.app", 540000, System.currentTimeMillis()));
 
             List<AppUsage> logs = db.appUsageDao().getRecentLogs(100);
             Log.d("AppUsageList", "Logs found: " + logs.size());
