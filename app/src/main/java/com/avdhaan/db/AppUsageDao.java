@@ -17,4 +17,8 @@ public interface AppUsageDao {
 
     @Query("DELETE FROM app_usage")
     void clearAll();
+
+    @Query("SELECT * FROM app_usage ORDER BY timestamp DESC LIMIT :limit")
+    List<com.avdhaan.db.AppUsage> getRecentLogs(int limit);
+
 }

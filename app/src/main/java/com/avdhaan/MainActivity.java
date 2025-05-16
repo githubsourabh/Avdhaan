@@ -2,7 +2,9 @@
 package com.avdhaan;
 
 import android.app.Activity;
+import android.app.AppOpsManager;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +12,10 @@ import android.provider.Settings;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import com.avdhaan.db.AppUsageLogger;
+
+import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
 
@@ -27,6 +33,7 @@ public class MainActivity extends Activity {
         focusSwitch = findViewById(R.id.focus_swtich);
         Button scheduleButton = findViewById(R.id.schedule_button);
         Button selectAppsButton = findViewById(R.id.btn_select_apps);
+        Button viewUsageButton = findViewById(R.id.btn_view_usage);
 
         boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .getBoolean(KEY_FOCUS_MODE, false);
@@ -66,11 +73,22 @@ public class MainActivity extends Activity {
         selectAppsButton.setOnClickListener(v ->
                 startActivity(new Intent(this, SelectAppsActivity.class))
         );
+
+        viewUsageButton.setOnClickListener(v ->
+                startActivity(new Intent(this, AppUsageListActivity.class))
+        );
+
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        if (!hasUsageStatsPermission(this)) {
+            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+            startActivity(intent);
+            Toast.makeText(this, "Please enable Usage Access for Avdhaan", Toast.LENGTH_LONG).show();
+        }
 
         boolean isAccessibilityOn = isAccessibilityEnabled();
         boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
@@ -88,6 +106,12 @@ public class MainActivity extends Activity {
         } else {
             focusSwitch.setChecked(isFocusOn);
         }
+
+        Executors.newSingleThreadExecutor().execute(() -> {
+            new AppUsageLogger(this).logUsage();
+        });
+
+
     }
 
     private boolean isAccessibilityEnabled() {
@@ -104,4 +128,12 @@ public class MainActivity extends Activity {
         editor.putBoolean(KEY_FOCUS_MODE, enabled);
         editor.apply();
     }
+
+    public static boolean hasUsageStatsPermission(Context context) {
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), context.getPackageName());
+        return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
 }
