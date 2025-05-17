@@ -9,12 +9,14 @@ public class AppUsage {
     public int id;
 
     public String packageName;
-    public long usageTimeMillis;
+
+    public long duration; // Renamed from usageTimeMillis to match the DAO queries
+
     public long timestamp;
 
-    public AppUsage(String packageName, long usageTimeMillis, long timestamp) {
+    public AppUsage(String packageName, long duration, long timestamp) {
         this.packageName = packageName;
-        this.usageTimeMillis = usageTimeMillis;
+        this.duration = duration;
         this.timestamp = timestamp;
     }
 }

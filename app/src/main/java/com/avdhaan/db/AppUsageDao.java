@@ -3,6 +3,7 @@ package com.avdhaan.db;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.RewriteQueriesToDropUnusedColumns;
 
 import java.util.List;
 
@@ -10,15 +11,24 @@ import java.util.List;
 public interface AppUsageDao {
 
     @Insert
-    void insert(com.avdhaan.db.AppUsage appUsage);
+    void insert(AppUsage appUsage);
 
-    @Query("SELECT * FROM app_usage ORDER BY timestamp DESC")
-    List<com.avdhaan.db.AppUsage> getAllUsages();
+    @Query("SELECT * FROM app_usage ORDER BY duration DESC")
+    List<AppUsage> getAll();
 
-    @Query("DELETE FROM app_usage")
-    void clearAll();
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT packageName, SUM(duration) as totalDuration, NULL as startOfPeriod " +
+            "FROM app_usage GROUP BY packageName ORDER BY totalDuration DESC")
+    List<AppUsageSummary> getUsageSummary();
 
-    @Query("SELECT * FROM app_usage ORDER BY timestamp DESC LIMIT :limit")
-    List<com.avdhaan.db.AppUsage> getRecentLogs(int limit);
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT packageName, SUM(duration) as totalDuration, NULL as startOfPeriod " +
+            "FROM app_usage GROUP BY packageName ORDER BY totalDuration DESC")
+    List<AppUsageSummary> getTotalUsageSummary();
 
+    @RewriteQueriesToDropUnusedColumns
+    @Query("SELECT packageName, SUM(duration) as totalDuration, " +
+            "date(timestamp / 1000, 'unixepoch') as startOfPeriod " +
+            "FROM app_usage GROUP BY packageName, startOfPeriod ORDER BY startOfPeriod DESC")
+    List<AppUsageSummary> getDailyUsageSummary();
 }
