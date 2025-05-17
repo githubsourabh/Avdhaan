@@ -20,3 +20,5 @@ captures/
 *.apk
 *.ap_
 
+#dump file
+*.hprof
