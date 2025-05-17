@@ -1,4 +1,3 @@
-
 package com.avdhaan
 
 import android.app.AppOpsManager
@@ -39,7 +38,7 @@ fun OnboardingNav() {
     NavHost(navController = navController, startDestination = "welcome") {
         composable("welcome") { WelcomeScreen(navController) }
         composable("permissions") { PermissionExplanationScreen(navController) }
-        composable("done") { ConfirmationScreen(navController) }
+        composable("done") { ConfirmationScreen() }
     }
 }
 
@@ -98,7 +97,7 @@ fun PermissionExplanationScreen(navController: NavHostController) {
 }
 
 @Composable
-fun ConfirmationScreen(navController: NavHostController) {
+fun ConfirmationScreen() {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxSize().padding(24.dp),
@@ -117,6 +116,7 @@ fun ConfirmationScreen(navController: NavHostController) {
     }
 }
 
+@Suppress("DEPRECATION")
 fun checkUsageStatsPermission(context: Context): Boolean {
     val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
     val mode = appOps.checkOpNoThrow(

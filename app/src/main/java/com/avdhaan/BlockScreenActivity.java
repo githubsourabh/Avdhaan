@@ -14,19 +14,6 @@ public class BlockScreenActivity extends Activity {
     public static boolean isShowing = false;
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        isShowing = true;
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        isShowing = false;
-    }
-
-
-    @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             getApplication().registerActivityLifecycleCallbacks(new android.app.Application.ActivityLifecycleCallbacks() {
@@ -67,8 +54,7 @@ public class BlockScreenActivity extends Activity {
             intent.addCategory(Intent.CATEGORY_HOME);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent);
-           });
-
+        });
     }
 
     @Override

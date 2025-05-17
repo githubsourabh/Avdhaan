@@ -12,6 +12,7 @@
     <string name="cancel">Cancel</string>
     <string name="BTN_SET_FOCUS_SCH">Set Focus Schedule</string>
     <string name="WELCOME_MSG">Welcome to Avdhaan!</string>
+    <string name="blocked_apps_updated">Blocked apps list updated</string>
 
     <string name="TXT_CONF_DEL_ALL_SCH">Are you sure you want to delete all schedules?</string>
     <string name="BTN_CLR_ALL_SCH">Clear All Schedules</string>
@@ -56,7 +57,5 @@
     <string name="TGL_SAT">SAT</string>
 
     <string name="MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG">Accessibility service is disabled. Focus Mode turned off.</string>
-
-
 
 </resources>

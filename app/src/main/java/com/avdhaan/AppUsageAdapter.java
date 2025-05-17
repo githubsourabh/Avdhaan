@@ -1,10 +1,11 @@
-
 package com.avdhaan;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,40 +17,72 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.avdhaan.db.AppUsage;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHolder> {
 
+    private static final String TAG = "AppUsageAdapter";
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
+
     private final Context context;
     private final List<AppUsage> usageList;
+    private final PackageManager packageManager;
+    private final Map<String, String> appNameCache = new HashMap<>();
+    private final Map<String, Drawable> appIconCache = new HashMap<>();
 
     public AppUsageAdapter(Context context, List<AppUsage> usageList) {
         this.context = context;
         this.usageList = usageList;
+        this.packageManager = context.getPackageManager();
+        prefetchAppInfo();
+    }
+
+    private void prefetchAppInfo() {
+        executor.execute(() -> {
+            for (AppUsage usage : usageList) {
+                if (!appNameCache.containsKey(usage.packageName)) {
+                    try {
+                        ApplicationInfo appInfo = packageManager.getApplicationInfo(usage.packageName, 0);
+                        String appName = packageManager.getApplicationLabel(appInfo).toString();
+                        Drawable icon = packageManager.getApplicationIcon(appInfo);
+                        
+                        appNameCache.put(usage.packageName, appName);
+                        appIconCache.put(usage.packageName, icon);
+                        
+                        // Notify adapter that item data has changed
+                        mainHandler.post(() -> notifyDataSetChanged());
+                    } catch (PackageManager.NameNotFoundException e) {
+                        appNameCache.put(usage.packageName, usage.packageName);
+                        appIconCache.put(usage.packageName, context.getDrawable(android.R.drawable.sym_def_app_icon));
+                    }
+                }
+            }
+        });
     }
 
     @NonNull
     @Override
-    public AppUsageAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.item_app_usage, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull AppUsageAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AppUsage usage = usageList.get(position);
+        String appName = appNameCache.getOrDefault(usage.packageName, usage.packageName);
+        Drawable icon = appIconCache.getOrDefault(usage.packageName, 
+            context.getDrawable(android.R.drawable.sym_def_app_icon));
 
-        holder.appName.setText(getAppName(context, usage.packageName));
+        holder.appName.setText(appName);
         holder.usageDuration.setText(formatDuration(usage.usageTimeMillis));
-
-        try {
-            Drawable icon = context.getPackageManager()
-                    .getApplicationIcon(usage.packageName);
-            holder.appIcon.setImageDrawable(icon);
-        } catch (PackageManager.NameNotFoundException e) {
-            holder.appIcon.setImageResource(android.R.drawable.sym_def_app_icon);
-        }
+        holder.appIcon.setImageDrawable(icon);
     }
 
     @Override
@@ -70,20 +103,13 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
         }
     }
 
-    private String formatDuration(long durationMillis) {
+    private static String formatDuration(long durationMillis) {
         long minutes = TimeUnit.MILLISECONDS.toMinutes(durationMillis);
         long seconds = TimeUnit.MILLISECONDS.toSeconds(durationMillis) % 60;
         return String.format("%d min %02d sec", minutes, seconds);
     }
 
-    private String getAppName(Context context, String packageName) {
-        try {
-            PackageManager pm = context.getPackageManager();
-            ApplicationInfo appInfo = pm.getApplicationInfo(packageName, 0);
-            return pm.getApplicationLabel(appInfo).toString();
-        } catch (PackageManager.NameNotFoundException e) {
-            return packageName; // fallback
-        }
+    public void onDestroy() {
+        executor.shutdown();
     }
-
 }

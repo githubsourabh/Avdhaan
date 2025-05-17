@@ -10,10 +10,23 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ScheduleViewHolder> {
+
+    private static final Map<Integer, String> DAY_NAMES = new HashMap<>();
+    static {
+        DAY_NAMES.put(1, "Sunday");
+        DAY_NAMES.put(2, "Monday");
+        DAY_NAMES.put(3, "Tuesday");
+        DAY_NAMES.put(4, "Wednesday");
+        DAY_NAMES.put(5, "Thursday");
+        DAY_NAMES.put(6, "Friday");
+        DAY_NAMES.put(7, "Saturday");
+    }
 
     public interface OnScheduleUpdated {
         void onEdit(int position);
@@ -54,29 +67,15 @@ public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapte
 
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
-        final FocusSchedule schedule = schedules.get(position);
-
-        String day = getDayName(schedule.getDayOfWeek());
-        String time = formatTime(schedule.getStartHour(), schedule.getStartMinute()) +
+        FocusSchedule schedule = schedules.get(position);
+        String day = getDayName(schedule.dayOfWeek);
+        String time = formatTime(schedule.startHour, schedule.startMinute) +
                 " - " +
-                formatTime(schedule.getEndHour(), schedule.getEndMinute());
+                formatTime(schedule.endHour, schedule.endMinute);
+        holder.scheduleText.setText(day + " " + time);
 
-        holder.dayName.setText(day);
-        holder.scheduleText.setText(time);
-
-        holder.editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                callback.onEdit(position);
-            }
-        });
-
-        holder.deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                callback.onDelete(position);
-            }
-        });
+        holder.editButton.setOnClickListener(v -> callback.onEdit(position));
+        holder.deleteButton.setOnClickListener(v -> callback.onDelete(position));
     }
 
     @Override
@@ -85,16 +84,7 @@ public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapte
     }
 
     private String getDayName(int dayOfWeek) {
-        switch (dayOfWeek) {
-            case 1: return "Sunday";
-            case 2: return "Monday";
-            case 3: return "Tuesday";
-            case 4: return "Wednesday";
-            case 5: return "Thursday";
-            case 6: return "Friday";
-            case 7: return "Saturday";
-            default: return "Unknown";
-        }
+        return DAY_NAMES.getOrDefault(dayOfWeek, "Unknown");
     }
 
     private String formatTime(int hour, int minute) {

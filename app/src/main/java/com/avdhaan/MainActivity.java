@@ -1,4 +1,3 @@
-
 package com.avdhaan;
 
 import android.app.Activity;
@@ -15,12 +14,15 @@ import android.widget.Toast;
 
 import com.avdhaan.db.AppUsageLogger;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends Activity {
 
     private static final String PREFS_NAME = "FocusPrefs";
     private static final String KEY_FOCUS_MODE = "focusEnabled";
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private AppUsageLogger appUsageLogger;
 
     private Switch focusSwitch;
     private boolean requestedEnable = false;
@@ -30,6 +32,7 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        appUsageLogger = new AppUsageLogger(getApplicationContext());
         focusSwitch = findViewById(R.id.focus_swtich);
         Button scheduleButton = findViewById(R.id.schedule_button);
         Button selectAppsButton = findViewById(R.id.btn_select_apps);
@@ -77,18 +80,11 @@ public class MainActivity extends Activity {
         viewUsageButton.setOnClickListener(v ->
                 startActivity(new Intent(this, AppUsageListActivity.class))
         );
-
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-
-        if (!hasUsageStatsPermission(this)) {
-            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-            startActivity(intent);
-            Toast.makeText(this, "Please enable Usage Access for Avdhaan", Toast.LENGTH_LONG).show();
-        }
 
         boolean isAccessibilityOn = isAccessibilityEnabled();
         boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
@@ -107,11 +103,26 @@ public class MainActivity extends Activity {
             focusSwitch.setChecked(isFocusOn);
         }
 
-        Executors.newSingleThreadExecutor().execute(() -> {
-            new AppUsageLogger(this).logUsage();
+        executor.execute(() -> {
+            if (hasUsageStatsPermission(this)) {
+                appUsageLogger.logUsage();
+            } else {
+                runOnUiThread(() -> {
+                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                    startActivity(intent);
+                    Toast.makeText(this, "Please enable Usage Access for Avdhaan", Toast.LENGTH_LONG).show();
+                });
+            }
         });
+    }
 
-
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (appUsageLogger != null) {
+            appUsageLogger.shutdown();
+        }
+        executor.shutdownNow();
     }
 
     private boolean isAccessibilityEnabled() {
@@ -135,5 +146,4 @@ public class MainActivity extends Activity {
                 android.os.Process.myUid(), context.getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
     }
-
 }

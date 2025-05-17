@@ -17,15 +17,21 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class SelectAppsActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "BlockedPrefs";
     private static final String BLOCKED_APPS_KEY = "blockedApps";
+    private static final String TAG = "SelectAppsActivity";
+    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     private RecyclerView recyclerView;
     private AppListAdapter adapter;
     private Set<String> blockedApps = new HashSet<>();
+    private SharedPreferences prefs;
+    private PackageManager packageManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,51 +40,59 @@ public class SelectAppsActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.apps_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        
+        prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        packageManager = getPackageManager();
 
         loadBlockedAppsFromPrefs();
         loadInstalledApps();
     }
 
     private void loadBlockedAppsFromPrefs() {
-        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         Set<String> savedSet = prefs.getStringSet(BLOCKED_APPS_KEY, new HashSet<>());
-        // Defensive copy to prevent SharedPreferences from returning a mutable reference
-        blockedApps = new HashSet<>(savedSet);
+        blockedApps = new HashSet<>(savedSet != null ? savedSet : new HashSet<>());
     }
 
     private void saveBlockedAppsToPrefs() {
-        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit();
-        editor.putStringSet(BLOCKED_APPS_KEY, new HashSet<>(blockedApps));
-        editor.apply();
-        Toast.makeText(this, "Blocked apps updated", Toast.LENGTH_SHORT).show();
+        prefs.edit()
+            .putStringSet(BLOCKED_APPS_KEY, new HashSet<>(blockedApps))
+            .apply();
+        Toast.makeText(this, R.string.blocked_apps_updated, Toast.LENGTH_SHORT).show();
     }
 
     private void loadInstalledApps() {
-        PackageManager pm = getPackageManager();
-        List<ApplicationInfo> installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        List<AppInfo> userApps = new ArrayList<>();
+        executor.execute(() -> {
+            List<ApplicationInfo> installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+            List<AppInfo> userApps = new ArrayList<>();
+            String currentPackage = getPackageName();
 
-        String currentPackage = getPackageName();
+            for (ApplicationInfo app : installedApps) {
+                if (packageManager.getLaunchIntentForPackage(app.packageName) != null &&
+                        !app.packageName.equals(currentPackage)) {
 
-        for (ApplicationInfo app : installedApps) {
-            if (pm.getLaunchIntentForPackage(app.packageName) != null &&
-                    !app.packageName.equals(currentPackage)) {
+                    String appName = packageManager.getApplicationLabel(app).toString();
+                    Drawable icon = packageManager.getApplicationIcon(app);
+                    boolean isBlocked = blockedApps.contains(app.packageName);
 
-                String appName = pm.getApplicationLabel(app).toString();
-                Drawable icon = pm.getApplicationIcon(app);
-                boolean isBlocked = blockedApps.contains(app.packageName);
-
-                userApps.add(new AppInfo(appName, app.packageName, icon, isBlocked));
+                    userApps.add(new AppInfo(appName, app.packageName, icon, isBlocked));
+                }
             }
-        }
 
-        Collections.sort(userApps, (a, b) -> a.name.compareToIgnoreCase(b.name));
+            Collections.sort(userApps, (a, b) -> a.name.compareToIgnoreCase(b.name));
 
-        adapter = new AppListAdapter(userApps, updatedBlockedApps -> {
-            blockedApps = updatedBlockedApps;
-            saveBlockedAppsToPrefs();
+            runOnUiThread(() -> {
+                adapter = new AppListAdapter(userApps, updatedBlockedApps -> {
+                    blockedApps = updatedBlockedApps;
+                    saveBlockedAppsToPrefs();
+                });
+                recyclerView.setAdapter(adapter);
+            });
         });
+    }
 
-        recyclerView.setAdapter(adapter);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        executor.shutdown();
     }
 }

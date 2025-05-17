@@ -13,28 +13,41 @@ import java.util.Set;
 
 public class AppBlockService extends AccessibilityService {
 
+    private static final String TAG = "AppBlockService";
+    private static final String PREFS_NAME = "FocusPrefs";
+    private static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
+    private static final String KEY_FOCUS_MODE = "focusEnabled";
+    private static final String KEY_BLOCKED_APPS = "blockedApps";
+
     private Set<String> blockedApps = new HashSet<>();
+    private SharedPreferences prefs;
+    private SharedPreferences blockedPrefs;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        blockedPrefs = getSharedPreferences(BLOCKED_PREFS_NAME, MODE_PRIVATE);
+    }
 
     private boolean isFocusModeOn() {
-        return getSharedPreferences("FocusPrefs", MODE_PRIVATE)
-                .getBoolean("focusEnabled", false);
+        return prefs.getBoolean(KEY_FOCUS_MODE, false);
     }
+
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
         loadBlockedApps();
-        Log.d("AppBlockService", "Service connected");
+        Log.d(TAG, "Service connected");
     }
 
     private void loadBlockedApps() {
-        SharedPreferences prefs = getSharedPreferences("BlockedPrefs", MODE_PRIVATE);
-        blockedApps = prefs.getStringSet("blockedApps", new HashSet<>());
-        if (blockedApps == null) blockedApps = new HashSet<>();
+        Set<String> savedSet = blockedPrefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
+        blockedApps = savedSet != null ? new HashSet<>(savedSet) : new HashSet<>();
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-
         if (!isFocusModeOn()) return;
 
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
@@ -46,7 +59,7 @@ public class AppBlockService extends AccessibilityService {
 
         if (BlockScreenActivity.isShowing) return;
 
-        Log.d("AppBlockService", "Blocking app: " + packageName);
+        Log.d(TAG, "Blocking app: " + packageName);
 
         Intent intent = new Intent(this, BlockScreenActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -62,10 +75,10 @@ public class AppBlockService extends AccessibilityService {
 
         List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
         for (FocusSchedule schedule : schedules) {
-            if (schedule.getDayOfWeek() != currentDay) continue;
+            if (schedule.dayOfWeek != currentDay) continue;
 
-            int start = schedule.getStartHour() * 60 + schedule.getStartMinute();
-            int end = schedule.getEndHour() * 60 + schedule.getEndMinute();
+            int start = schedule.startHour * 60 + schedule.startMinute;
+            int end = schedule.endHour * 60 + schedule.endMinute;
 
             if (nowMinutes >= start && nowMinutes <= end) return true;
         }
@@ -74,6 +87,6 @@ public class AppBlockService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-        Log.d("AppBlockService", "Service Interrupted");
+        Log.d(TAG, "Service Interrupted");
     }
 }

@@ -1,4 +1,3 @@
-
 package com.avdhaan;
 
 import java.io.Serializable;
@@ -10,25 +9,7 @@ public class FocusSchedule implements Serializable {
     public int endHour;
     public int endMinute;
 
-    public int getDayOfWeek() {
-        return dayOfWeek;
-    }
-
-    public int getStartHour() {
-        return startHour;
-    }
-
-    public int getStartMinute() {
-        return startMinute;
-    }
-
-    public int getEndHour() {
-        return endHour;
-    }
-
-    public int getEndMinute() {
-        return endMinute;
-    }
+    private static final int MINUTES_PER_HOUR = 60;
 
     public FocusSchedule(int dayOfWeek, int startHour, int startMinute, int endHour, int endMinute) {
         this.dayOfWeek = dayOfWeek;
@@ -40,9 +21,17 @@ public class FocusSchedule implements Serializable {
 
     public boolean matches(int day, int hour, int minute) {
         if (day != dayOfWeek) return false;
-        int startTotal = startHour * 60 + startMinute;
-        int endTotal = endHour * 60 + endMinute;
-        int currentTotal = hour * 60 + minute;
+        return isTimeInRange(hour, minute);
+    }
+
+    public boolean isTimeInRange(int hour, int minute) {
+        int currentTotal = convertToMinutes(hour, minute);
+        int startTotal = convertToMinutes(startHour, startMinute);
+        int endTotal = convertToMinutes(endHour, endMinute);
         return currentTotal >= startTotal && currentTotal <= endTotal;
+    }
+
+    private static int convertToMinutes(int hours, int minutes) {
+        return hours * MINUTES_PER_HOUR + minutes;
     }
 }
