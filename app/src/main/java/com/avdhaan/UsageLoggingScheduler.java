@@ -11,16 +11,18 @@ import java.util.concurrent.TimeUnit;
 public class UsageLoggingScheduler {
 
     private static final String USAGE_LOGGING_WORK = "usage_logging_work";
+    // 55-minute interval provides 5-minute overlap with 1-hour lookback window
+    private static final long USAGE_LOGGING_INTERVAL_MINUTES = 55;
 
     public static void schedule(Context context) {
         PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(
                 UsageLoggingWorker.class,
-                15, TimeUnit.MINUTES // ⏱️ Minimum interval supported
+                USAGE_LOGGING_INTERVAL_MINUTES, TimeUnit.MINUTES
         ).build();
 
         WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 USAGE_LOGGING_WORK,
-                ExistingPeriodicWorkPolicy.KEEP,
+                ExistingPeriodicWorkPolicy.REPLACE,
                 workRequest
         );
     }
