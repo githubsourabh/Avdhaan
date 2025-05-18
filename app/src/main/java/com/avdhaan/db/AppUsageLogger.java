@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class AppUsageLogger {
 
     private static final String TAG = "AppUsageLogger";
-    private static final long MIN_USAGE_THRESHOLD_MS = 5000; // 5 seconds
+    private static final long MIN_USAGE_THRESHOLD_MS = 1000; // 1 second
     private final ExecutorService executor;
     private volatile boolean isShutdown = false;
 

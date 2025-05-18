@@ -2,6 +2,8 @@
 .gradle/
 build/
 */build/
+gradlew
+gradlew.bat
 
 # Local config
 local.properties
@@ -19,6 +21,8 @@ captures/
 # Generated files
 *.apk
 *.ap_
+*.jar
 
 #dump file
 *.hprof
+
