@@ -27,12 +27,14 @@ public class AppUsageLogger {
     private final PackageManager packageManager;
     private final Set<String> systemApps;
     private final Map<String, Boolean> appCache;
+    private final Map<String, Long> lastLoggedTime;
 
     public AppUsageLogger(Context context) {
         this.context = context;
         this.packageManager = context.getPackageManager();
         this.systemApps = new HashSet<>();
         this.appCache = new HashMap<>();
+        this.lastLoggedTime = new HashMap<>();
         this.executor = Executors.newSingleThreadExecutor();
     }
 
@@ -81,51 +83,87 @@ public class AppUsageLogger {
             String packageName = event.getPackageName();
             if (packageName == null) continue;
 
+            // Skip own app
+            if (packageName.equals(context.getPackageName())) continue;
+
             long eventTime = event.getTimeStamp();
+            int eventType = event.getEventType();
 
-            if (event.getEventType() == UsageEvents.Event.MOVE_TO_FOREGROUND) {
-                foregroundTimestamps.put(packageName, eventTime);
-            } else if (event.getEventType() == UsageEvents.Event.MOVE_TO_BACKGROUND) {
-                Long start = foregroundTimestamps.get(packageName);
-                if (start != null) {
-                    long usageDuration = eventTime - start;
+            switch (eventType) {
+                case UsageEvents.Event.MOVE_TO_FOREGROUND:
+                    foregroundTimestamps.put(packageName, eventTime);
+                    break;
 
-                    if (usageDuration >= MIN_USAGE_THRESHOLD_MS && 
-                        !isSystemApp(packageName) && 
-                        !packageName.equals(context.getPackageName())) {
-                        
-                        try {
-                            AppUsage usage = new AppUsage(
-                                    packageName,
-                                    usageDuration,
-                                    eventTime
-                            );
-                            db.appUsageDao().insert(usage);
-                        } catch (Exception e) {
-                            Log.e(TAG, "Error inserting usage for " + packageName, e);
-                        }
+                case UsageEvents.Event.MOVE_TO_BACKGROUND:
+                    Long start = foregroundTimestamps.get(packageName);
+                    if (start != null) {
+                        processUsageEvent(packageName, start, eventTime, db);
+                        foregroundTimestamps.remove(packageName);
                     }
-                    foregroundTimestamps.remove(packageName);
-                }
+                    break;
             }
         }
     }
 
-    private boolean isSystemApp(String packageName) {
+    private void processUsageEvent(String packageName, long startTime, long endTime, AppDatabase db) {
+        long usageDuration = endTime - startTime;
+        Long lastLogged = lastLoggedTime.get(packageName);
+
+        if (usageDuration >= MIN_USAGE_THRESHOLD_MS &&
+            (lastLogged == null || (endTime - lastLogged) >= MIN_USAGE_THRESHOLD_MS)) {
+            
+            try {
+                if (shouldTrackApp(packageName)) {
+                    AppUsage usage = new AppUsage(
+                            packageName,
+                            usageDuration,
+                            endTime
+                    );
+                    db.appUsageDao().insert(usage);
+                    lastLoggedTime.put(packageName, endTime);
+                    Log.d(TAG, "Inserted usage for " + packageName + ": " + usageDuration);
+                }
+            } catch (Exception e) {
+                Log.e(TAG, "Error inserting usage for " + packageName, e);
+            }
+        }
+    }
+
+    private boolean shouldTrackApp(String packageName) {
         Boolean cached = appCache.get(packageName);
         if (cached != null) return cached;
         
         try {
             ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
-            boolean isSystem = (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
-            appCache.put(packageName, isSystem);
-            if (isSystem) {
+            
+            // Track the app if any of these conditions are true:
+            // 1. It's not a system app
+            // 2. It's a system app but has been updated (user version installed)
+            // 3. It has a launcher activity (user can open it)
+            // 4. It's categorized as a game
+            boolean shouldTrack = true;
+            
+            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                boolean isUpdatedSystemApp = (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+                boolean hasLauncherActivity = packageManager.getLaunchIntentForPackage(packageName) != null;
+                boolean isGame = (appInfo.category == ApplicationInfo.CATEGORY_GAME);
+                
+                // Only filter out system apps that are:
+                // - Not updated by user
+                // - Not launchable
+                // - Not games
+                shouldTrack = isUpdatedSystemApp || hasLauncherActivity || isGame;
+            }
+            
+            appCache.put(packageName, shouldTrack);
+            if (!shouldTrack) {
                 systemApps.add(packageName);
             }
-            return isSystem;
+            return shouldTrack;
+            
         } catch (PackageManager.NameNotFoundException e) {
+            // If we can't find the package, assume we should track it
             appCache.put(packageName, true);
-            systemApps.add(packageName);
             return true;
         }
     }
