@@ -13,6 +13,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.avdhaan.db.AppUsageLogger;
+import com.avdhaan.worker.UsageLoggingScheduler;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +32,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // ✅ Ensure logging is scheduled even if onboarding is skipped
+        UsageLoggingScheduler.schedule(getApplicationContext());
 
         appUsageLogger = new AppUsageLogger(getApplicationContext());
         focusSwitch = findViewById(R.id.focus_swtich);

@@ -7,6 +7,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.avdhaan.worker.UsageLoggingScheduler;
+
 public class OnboardingActivity extends AppCompatActivity {
 
     private Button startButton;
@@ -20,7 +22,10 @@ public class OnboardingActivity extends AppCompatActivity {
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Navigate to the main screen or desired next activity
+                // ✅ Schedule usage logging once user taps Start
+                UsageLoggingScheduler.schedule(getApplicationContext());
+
+                // Proceed to the main activity
                 Intent intent = new Intent(OnboardingActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
