@@ -22,45 +22,75 @@ public class AppBlockService extends AccessibilityService {
     private Set<String> blockedApps = new HashSet<>();
     private SharedPreferences prefs;
     private SharedPreferences blockedPrefs;
+    private boolean isServiceConnected = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         blockedPrefs = getSharedPreferences(BLOCKED_PREFS_NAME, MODE_PRIVATE);
+        Log.d(TAG, "Service created");
     }
 
     private boolean isFocusModeOn() {
-        return prefs.getBoolean(KEY_FOCUS_MODE, false);
+        boolean isOn = prefs.getBoolean(KEY_FOCUS_MODE, false);
+        Log.d(TAG, "Focus mode is " + (isOn ? "ON" : "OFF"));
+        return isOn;
     }
 
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
+        isServiceConnected = true;
         loadBlockedApps();
-        Log.d(TAG, "Service connected");
+        Log.d(TAG, "Service connected. Blocked apps count: " + blockedApps.size());
+        
+        // Send broadcast to notify that service is connected
+        Intent intent = new Intent("com.avdhaan.SERVICE_CONNECTED");
+        sendBroadcast(intent);
     }
 
     private void loadBlockedApps() {
         Set<String> savedSet = blockedPrefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
         blockedApps = savedSet != null ? new HashSet<>(savedSet) : new HashSet<>();
+        Log.d(TAG, "Loaded blocked apps: " + blockedApps);
     }
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
-        if (!isFocusModeOn()) return;
+        if (!isServiceConnected) {
+            Log.d(TAG, "Service not connected, skipping event");
+            return;
+        }
 
-        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
+        if (!isFocusModeOn()) {
+            Log.d(TAG, "Focus mode is off, skipping event");
+            return;
+        }
+
+        if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            return;
+        }
         
         String packageName = String.valueOf(event.getPackageName());
-        if (!blockedApps.contains(packageName)) return;
+        Log.d(TAG, "Checking package: " + packageName);
 
-        if (!isWithinFocusTime()) return;
+        if (!blockedApps.contains(packageName)) {
+            Log.d(TAG, "Package not in blocked list: " + packageName);
+            return;
+        }
 
-        if (BlockScreenActivity.isShowing) return;
+        if (!isWithinFocusTime()) {
+            Log.d(TAG, "Not within focus time for package: " + packageName);
+            return;
+        }
+
+        if (BlockScreenActivity.isShowing) {
+            Log.d(TAG, "Block screen already showing");
+            return;
+        }
 
         Log.d(TAG, "Blocking app: " + packageName);
-
         Intent intent = new Intent(this, BlockScreenActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
@@ -74,19 +104,48 @@ public class AppBlockService extends AccessibilityService {
         int nowMinutes = currentHour * 60 + currentMinute;
 
         List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+        Log.d(TAG, "Checking schedules. Current time: " + currentHour + ":" + currentMinute + 
+              ", Day: " + currentDay + ", Total schedules: " + schedules.size());
+
         for (FocusSchedule schedule : schedules) {
-            if (schedule.dayOfWeek != currentDay) continue;
+            if (schedule.dayOfWeek != currentDay) {
+                Log.d(TAG, "Schedule day " + schedule.dayOfWeek + " doesn't match current day " + currentDay);
+                continue;
+            }
 
             int start = schedule.startHour * 60 + schedule.startMinute;
             int end = schedule.endHour * 60 + schedule.endMinute;
 
-            if (nowMinutes >= start && nowMinutes <= end) return true;
+            Log.d(TAG, "Checking schedule: " + schedule.startHour + ":" + schedule.startMinute + 
+                  " to " + schedule.endHour + ":" + schedule.endMinute);
+
+            if (nowMinutes >= start && nowMinutes <= end) {
+                Log.d(TAG, "Within schedule time");
+                return true;
+            }
         }
+        Log.d(TAG, "Not within any schedule time");
         return false;
     }
 
     @Override
     public void onInterrupt() {
         Log.d(TAG, "Service Interrupted");
+        isServiceConnected = false;
+        
+        // Try to restart the service
+        Intent intent = new Intent(this, AppBlockService.class);
+        startService(intent);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        isServiceConnected = false;
+        Log.d(TAG, "Service Destroyed");
+        
+        // Try to restart the service
+        Intent intent = new Intent(this, AppBlockService.class);
+        startService(intent);
     }
 }

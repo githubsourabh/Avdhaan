@@ -1,16 +1,22 @@
 package com.avdhaan;
 
-import android.app.Activity;
 import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.ContentObserver;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.widget.Button;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AlertDialog;
 
 import com.avdhaan.db.AppUsageLogger;
 import com.avdhaan.worker.UsageLoggingScheduler;
@@ -18,7 +24,7 @@ import com.avdhaan.worker.UsageLoggingScheduler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity implements UsageTrackingDialog.Callback {
 
     private static final String PREFS_NAME = "FocusPrefs";
     private static final String KEY_FOCUS_MODE = "focusEnabled";
@@ -26,12 +32,31 @@ public class MainActivity extends Activity {
     private AppUsageLogger appUsageLogger;
 
     private Switch focusSwitch;
+    private Switch usageTrackingSwitch;
+    private PermissionManager permissionManager;
+    private UsageTrackingPreferences trackingPreferences;
     private boolean requestedEnable = false;
+
+    private ContentObserver permissionObserver;
+    private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        permissionManager = new PermissionManager(getApplicationContext());
+        trackingPreferences = new UsageTrackingPreferences(getApplicationContext());
+
+        setupPermissionObserver();
+        setupUsageTracking();
+        initializeFocusMode();
+        initializeButtons();
+
+        // Show tracking dialog if first time user
+        if (trackingPreferences.isFirstTimeUser()) {
+            new UsageTrackingDialog(this, this).show();
+        }
 
         // ✅ Ensure logging is scheduled even if onboarding is skipped
         UsageLoggingScheduler.schedule(getApplicationContext());
@@ -86,10 +111,119 @@ public class MainActivity extends Activity {
         );
     }
 
+    private void setupPermissionObserver() {
+        permissionObserver = new ContentObserver(mainHandler) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                // Check permission state on any settings change
+                permissionManager.checkAndUpdatePermissionState();
+            }
+        };
+        
+        // Register the observer for settings changes
+        getContentResolver().registerContentObserver(
+            Settings.Secure.CONTENT_URI,
+            true,
+            permissionObserver
+        );
+    }
+
+    private void setupUsageTracking() {
+        usageTrackingSwitch = findViewById(R.id.switch_usage_tracking);
+        usageTrackingSwitch.setChecked(trackingPreferences.isTrackingEnabled());
+
+        usageTrackingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked && !permissionManager.hasUsageStatsPermission()) {
+                // Need to request permission
+                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                startActivity(intent);
+                requestedEnable = true;
+                // Don't update preferences yet, wait for onResume
+                usageTrackingSwitch.setChecked(false);
+            } else {
+                updateUsageTracking(isChecked);
+            }
+        });
+    }
+
+    private void updateUsageTracking(boolean enabled) {
+        trackingPreferences.setTrackingEnabled(enabled);
+        if (enabled) {
+            UsageLoggingScheduler.schedule(getApplicationContext());
+            Toast.makeText(this, R.string.tracking_enabled, Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, R.string.tracking_disabled, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void initializeFocusMode() {
+        focusSwitch = findViewById(R.id.focus_swtich);
+        boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .getBoolean(KEY_FOCUS_MODE, false);
+
+        if (isAccessibilityEnabled()) {
+            focusSwitch.setChecked(isFocusOn);
+        } else {
+            focusSwitch.setChecked(false);
+            if (isFocusOn) {
+                saveFocusModeState(false);
+                Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
+            }
+        }
+
+        focusSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            if (isChecked) {
+                if (!isAccessibilityEnabled()) {
+                    Toast.makeText(this, getString(R.string.please_enable_accessibility), Toast.LENGTH_LONG).show();
+                    requestedEnable = true;
+                    focusSwitch.setChecked(false);
+                    Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                    startActivity(intent);
+                } else {
+                    saveFocusModeState(true);
+                    Toast.makeText(this, getString(R.string.focus_mode_enabled), Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                saveFocusModeState(false);
+                Toast.makeText(this, getString(R.string.focus_mode_disabled), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void initializeButtons() {
+        Button scheduleButton = findViewById(R.id.schedule_button);
+        Button selectAppsButton = findViewById(R.id.btn_select_apps);
+        Button viewUsageButton = findViewById(R.id.btn_view_usage);
+
+        scheduleButton.setOnClickListener(v ->
+                startActivity(new Intent(this, ScheduleListActivity.class))
+        );
+
+        selectAppsButton.setOnClickListener(v ->
+                startActivity(new Intent(this, SelectAppsActivity.class))
+        );
+
+        viewUsageButton.setOnClickListener(v ->
+                startActivity(new Intent(this, AppUsageListActivity.class))
+        );
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
 
+        // Immediately check permission state
+        permissionManager.checkAndUpdatePermissionState();
+
+        // Check if permission was just granted
+        if (requestedEnable && permissionManager.hasUsageStatsPermission()) {
+            usageTrackingSwitch.setChecked(true);
+            updateUsageTracking(true);
+            requestedEnable = false;
+        }
+
+        // Handle focus mode state
         boolean isAccessibilityOn = isAccessibilityEnabled();
         boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .getBoolean(KEY_FOCUS_MODE, false);
@@ -107,15 +241,27 @@ public class MainActivity extends Activity {
             focusSwitch.setChecked(isFocusOn);
         }
 
+        // Only log usage if permission is granted
         executor.execute(() -> {
-            if (hasUsageStatsPermission(this)) {
-                appUsageLogger.logUsage();
-            } else {
+            if (trackingPreferences.isTrackingEnabled() && !permissionManager.hasUsageStatsPermission()) {
+                // Show dialog instead of forcefully redirecting
                 runOnUiThread(() -> {
-                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                    startActivity(intent);
-                    Toast.makeText(this, "Please enable Usage Access for Avdhaan", Toast.LENGTH_LONG).show();
+                    new androidx.appcompat.app.AlertDialog.Builder(this)
+                        .setTitle(R.string.usage_access_required_title)
+                        .setMessage(R.string.usage_access_required_message)
+                        .setPositiveButton(R.string.open_settings, (dialog, which) -> {
+                            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                            startActivity(intent);
+                        })
+                        .setNegativeButton(R.string.disable_tracking, (dialog, which) -> {
+                            trackingPreferences.setTrackingEnabled(false);
+                            usageTrackingSwitch.setChecked(false);
+                        })
+                        .setCancelable(false)
+                        .show();
                 });
+            } else if (permissionManager.hasUsageStatsPermission()) {
+                appUsageLogger.logUsage();
             }
         });
     }
@@ -123,6 +269,9 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (permissionObserver != null) {
+            getContentResolver().unregisterContentObserver(permissionObserver);
+        }
         if (appUsageLogger != null) {
             appUsageLogger.shutdown();
         }
@@ -149,5 +298,17 @@ public class MainActivity extends Activity {
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(), context.getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
+    @Override
+    public void onTrackingEnabled() {
+        usageTrackingSwitch.setChecked(true);
+        updateUsageTracking(true);
+    }
+
+    @Override
+    public void onTrackingDisabled() {
+        usageTrackingSwitch.setChecked(false);
+        updateUsageTracking(false);
     }
 }

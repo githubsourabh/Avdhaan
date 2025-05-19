@@ -58,4 +58,35 @@
 
     <string name="MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG">Accessibility service is disabled. Focus Mode turned off.</string>
 
+    <!-- Usage Tracking -->
+    <string name="usage_tracking_title">Usage Tracking</string>
+    <string name="usage_tracking_description">Enable to get insights about your app usage</string>
+    <string name="usage_tracking_switch">Track app usage</string>
+    
+    <!-- Usage Tracking Dialog -->
+    <string name="usage_tracking_benefits_title">Enable usage tracking to:</string>
+    <string name="usage_tracking_benefit_1">See detailed app usage statistics</string>
+    <string name="usage_tracking_benefit_2">Get insights about your digital habits</string>
+    <string name="usage_tracking_benefit_3">Improve your focus and productivity</string>
+    <string name="usage_tracking_benefit_4">Receive personalized recommendations</string>
+    <string name="usage_tracking_change_anytime">You can change this setting anytime in the app.</string>
+    <string name="enable_tracking">Enable tracking</string>
+    <string name="disable_tracking">No, thanks</string>
+
+    <!-- Notifications -->
+    <string name="usage_access_removed_title">Usage Access Removed</string>
+    <string name="usage_access_removed_message">Tap to restore usage access permission</string>
+    <string name="enable_usage_access">Enable Access</string>
+    <string name="usage_access_restored_title">Usage Access Restored</string>
+    <string name="usage_access_restored_message">Usage tracking has been re-enabled</string>
+
+    <!-- Permission Dialogs -->
+    <string name="usage_access_required_title">Usage Access Required</string>
+    <string name="usage_access_required_message">Please enable usage access to track app usage</string>
+    <string name="open_settings">Open Settings</string>
+
+    <!-- Toast Messages -->
+    <string name="tracking_enabled">Usage tracking enabled</string>
+    <string name="tracking_disabled">Usage tracking disabled</string>
+
 </resources>
