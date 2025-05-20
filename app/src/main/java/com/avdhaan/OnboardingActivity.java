@@ -11,10 +11,10 @@ import android.widget.Button;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
+import static com.avdhaan.PreferenceConstants.*;
+
 public class OnboardingActivity extends AppCompatActivity {
     private static final String TAG = "OnboardingActivity";
-    private static final String PREF_NAME = "AvdhaanPrefs";
-    private static final String KEY_FIRST_TIME = "isFirstTime";
     private Button startButton;
     private SharedPreferences prefs;
 

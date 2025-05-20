@@ -1,5 +1,7 @@
 package com.avdhaan;
 
+
+
 import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -26,6 +28,8 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.avdhaan.PreferenceConstants.*;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "FocusPrefs";
@@ -50,6 +54,10 @@ public class MainActivity extends AppCompatActivity {
 
         permissionManager = new PermissionManager(getApplicationContext());
         trackingPreferences = new UsageTrackingPreferences(getApplicationContext());
+
+        // Set KEY_FIRST_TIME to false
+        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
+        prefs.edit().putBoolean(KEY_FIRST_TIME, false).apply();
 
         setupPermissionObserver();
         setupUsageTracking();
