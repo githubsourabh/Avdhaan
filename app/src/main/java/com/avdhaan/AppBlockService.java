@@ -97,6 +97,12 @@ public class AppBlockService extends AccessibilityService {
         String packageName = String.valueOf(event.getPackageName());
         Log.d(TAG, "Checking package: " + packageName);
 
+        // Skip if it's our own app
+        if (packageName.equals(getPackageName())) {
+            Log.d(TAG, "Skipping our own app: " + packageName);
+            return;
+        }
+
         if (!blockedApps.contains(packageName)) {
             Log.d(TAG, "Package not in blocked list: " + packageName);
             return;

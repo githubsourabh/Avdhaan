@@ -25,7 +25,7 @@ import com.avdhaan.worker.UsageLoggingScheduler;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class MainActivity extends AppCompatActivity implements UsageTrackingDialog.Callback {
+public class MainActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "FocusPrefs";
     private static final String KEY_FOCUS_MODE = "focusEnabled";
@@ -36,7 +36,8 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
     private Switch usageTrackingSwitch;
     private PermissionManager permissionManager;
     private UsageTrackingPreferences trackingPreferences;
-    private boolean requestedEnable = false;
+    private boolean requestedAccessibilityEnable = false;  // New flag for accessibility
+    private boolean requestedUsageEnable = false;         // Renamed flag for usage tracking
 
     private ContentObserver permissionObserver;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
@@ -54,12 +55,7 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
         initializeFocusMode();
         initializeButtons();
 
-        // Show tracking dialog if first time user
-        if (trackingPreferences.isFirstTimeUser()) {
-            new UsageTrackingDialog(this, this).show();
-        }
-
-        // ✅ Ensure logging is scheduled even if onboarding is skipped
+        // Ensure logging is scheduled
         UsageLoggingScheduler.schedule(getApplicationContext());
 
         appUsageLogger = new AppUsageLogger(getApplicationContext());
@@ -96,14 +92,15 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
 
     private void setupUsageTracking() {
         usageTrackingSwitch = findViewById(R.id.switch_usage_tracking);
-        usageTrackingSwitch.setChecked(trackingPreferences.isTrackingEnabled());
+        boolean isTrackingEnabled = trackingPreferences.isTrackingEnabled();
+        usageTrackingSwitch.setChecked(isTrackingEnabled);
 
         usageTrackingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked && !permissionManager.hasUsageStatsPermission()) {
                 // Need to request permission
                 Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
                 startActivity(intent);
-                requestedEnable = true;
+                requestedUsageEnable = true;  // Use renamed flag
                 // Don't update preferences yet, wait for onResume
                 usageTrackingSwitch.setChecked(false);
             } else {
@@ -144,7 +141,7 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
             if (isChecked) {
                 if (!isAccessibilityEnabled()) {
                     Toast.makeText(this, getString(R.string.please_enable_accessibility), Toast.LENGTH_LONG).show();
-                    requestedEnable = true;
+                    requestedAccessibilityEnable = true;  // Use new flag
                     focusSwitch.setChecked(false);
                     Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                     startActivity(intent);
@@ -196,11 +193,20 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
         // Immediately check permission state
         permissionManager.checkAndUpdatePermissionState();
 
-        // Check if permission was just granted
-        if (requestedEnable && permissionManager.hasUsageStatsPermission()) {
+        // Handle accessibility permission
+        if (requestedAccessibilityEnable && isAccessibilityEnabled()) {
+            focusSwitch.setChecked(true);
+            saveFocusModeState(true);
+            startAppBlockService();
+            Toast.makeText(this, getString(R.string.focus_mode_enabled), Toast.LENGTH_SHORT).show();
+            requestedAccessibilityEnable = false;
+        }
+
+        // Handle usage tracking permission
+        if (requestedUsageEnable && permissionManager.hasUsageStatsPermission()) {
             usageTrackingSwitch.setChecked(true);
             updateUsageTracking(true);
-            requestedEnable = false;
+            requestedUsageEnable = false;
         }
 
         // Handle focus mode state
@@ -208,12 +214,7 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
         boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
                 .getBoolean(KEY_FOCUS_MODE, false);
 
-        if (requestedEnable && isAccessibilityOn) {
-            focusSwitch.setChecked(true);
-            saveFocusModeState(true);
-            Toast.makeText(this, getString(R.string.focus_mode_enabled), Toast.LENGTH_SHORT).show();
-            requestedEnable = false;
-        } else if (!isAccessibilityOn && isFocusOn) {
+        if (!isAccessibilityOn && isFocusOn) {
             focusSwitch.setChecked(false);
             saveFocusModeState(false);
             Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
@@ -221,29 +222,31 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
             focusSwitch.setChecked(isFocusOn);
         }
 
-        // Only log usage if permission is granted
-        executor.execute(() -> {
-            if (trackingPreferences.isTrackingEnabled() && !permissionManager.hasUsageStatsPermission()) {
-                // Show dialog instead of forcefully redirecting
-                runOnUiThread(() -> {
-                    new androidx.appcompat.app.AlertDialog.Builder(this)
-                        .setTitle(R.string.usage_access_required_title)
-                        .setMessage(R.string.usage_access_required_message)
-                        .setPositiveButton(R.string.open_settings, (dialog, which) -> {
-                            Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                            startActivity(intent);
-                        })
-                        .setNegativeButton(R.string.disable_tracking, (dialog, which) -> {
-                            trackingPreferences.setTrackingEnabled(false);
-                            usageTrackingSwitch.setChecked(false);
-                        })
-                        .setCancelable(false)
-                        .show();
-                });
-            } else if (permissionManager.hasUsageStatsPermission()) {
-                appUsageLogger.logUsage();
-            }
-        });
+        // Only log usage if permission is granted and logger is initialized
+        if (appUsageLogger != null) {
+            executor.execute(() -> {
+                if (trackingPreferences.isTrackingEnabled() && !permissionManager.hasUsageStatsPermission()) {
+                    // Show dialog instead of forcefully redirecting
+                    runOnUiThread(() -> {
+                        new androidx.appcompat.app.AlertDialog.Builder(this)
+                            .setTitle(R.string.usage_access_required_title)
+                            .setMessage(R.string.usage_access_required_message)
+                            .setPositiveButton(R.string.open_settings, (dialog, which) -> {
+                                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                                startActivity(intent);
+                            })
+                            .setNegativeButton(R.string.disable_tracking, (dialog, which) -> {
+                                trackingPreferences.setTrackingEnabled(false);
+                                usageTrackingSwitch.setChecked(false);
+                            })
+                            .setCancelable(false)
+                            .show();
+                    });
+                } else if (permissionManager.hasUsageStatsPermission()) {
+                    appUsageLogger.logUsage();
+                }
+            });
+        }
     }
 
     @Override
@@ -278,17 +281,5 @@ public class MainActivity extends AppCompatActivity implements UsageTrackingDial
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(), context.getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
-    }
-
-    @Override
-    public void onTrackingEnabled() {
-        usageTrackingSwitch.setChecked(true);
-        updateUsageTracking(true);
-    }
-
-    @Override
-    public void onTrackingDisabled() {
-        usageTrackingSwitch.setChecked(false);
-        updateUsageTracking(false);
     }
 }

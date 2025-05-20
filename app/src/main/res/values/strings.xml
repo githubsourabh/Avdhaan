@@ -157,4 +157,6 @@
     <string name="schedule_blocking_setup">Schedule Blocking Setup</string>
     <string name="schedule_blocking_description">Your schedule blocking has been set up successfully. You can now manage your schedules and blocked apps from the main screen.</string>
     <string name="proceed_to_main">Proceed to Main Screen</string>
+
+    <string name="accessibility_service_summary">Service to block apps during focus mode</string>
 </resources>

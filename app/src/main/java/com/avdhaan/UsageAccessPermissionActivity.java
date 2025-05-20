@@ -6,7 +6,8 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.avdhaan.utils.OnboardingUtils;
+import com.avdhaan.OnboardingUtils;
+import com.avdhaan.UsageTrackingPreferences;
 
 public class UsageAccessPermissionActivity extends AppCompatActivity {
 
@@ -23,6 +24,8 @@ public class UsageAccessPermissionActivity extends AppCompatActivity {
         });
 
         buttonDeclineAccess.setOnClickListener(v -> {
+            // Set tracking as disabled when user declines
+            new UsageTrackingPreferences(this).setTrackingEnabled(false);
             startActivity(new Intent(this, UsageAccessDeclinedInfoActivity.class));
             finish();
         });
@@ -32,6 +35,8 @@ public class UsageAccessPermissionActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (OnboardingUtils.hasUsageStatsPermission(this)) {
+            // Set tracking as enabled when permission is granted
+            new UsageTrackingPreferences(this).setTrackingEnabled(true);
             startActivity(new Intent(this, AppSelectionOnboardingActivity.class));
             finish();
         }

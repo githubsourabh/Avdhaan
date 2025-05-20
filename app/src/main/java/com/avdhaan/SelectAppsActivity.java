@@ -25,7 +25,7 @@ public class SelectAppsActivity extends AppCompatActivity {
     private static final String PREFS_NAME = "BlockedPrefs";
     private static final String BLOCKED_APPS_KEY = "blockedApps";
     private static final String TAG = "SelectAppsActivity";
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private ExecutorService executor;
 
     private RecyclerView recyclerView;
     private AppListAdapter adapter;
@@ -38,6 +38,7 @@ public class SelectAppsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_apps);
 
+        executor = Executors.newSingleThreadExecutor();
         recyclerView = findViewById(R.id.apps_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         
@@ -61,42 +62,52 @@ public class SelectAppsActivity extends AppCompatActivity {
     }
 
     private void loadInstalledApps() {
-        executor.execute(() -> {
-            List<ApplicationInfo> installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-            List<AppInfo> userApps = new ArrayList<>();
-            String currentPackage = getPackageName();
+        if (executor != null && !executor.isShutdown()) {
+            executor.execute(() -> {
+                List<ApplicationInfo> installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
+                List<AppInfo> userApps = new ArrayList<>();
+                String currentPackage = getPackageName();
 
-            for (ApplicationInfo app : installedApps) {
-                if (packageManager.getLaunchIntentForPackage(app.packageName) != null) {
-                    String appName = packageManager.getApplicationLabel(app).toString();
-                    Drawable icon;
-                    try {
-                        icon = packageManager.getApplicationIcon(app);
-                    } catch (Exception e) {
-                        // If there's an error loading the icon, use a default icon
-                        icon = getResources().getDrawable(R.mipmap.ic_launcher, getTheme());
+                for (ApplicationInfo app : installedApps) {
+                    // Skip only our own app
+                    if (app.packageName.equals(currentPackage)) {
+                        continue;
                     }
-                    boolean isBlocked = blockedApps.contains(app.packageName);
+                    // Show all launchable apps (system and user)
+                    if (packageManager.getLaunchIntentForPackage(app.packageName) != null) {
+                        String appName = packageManager.getApplicationLabel(app).toString();
+                        Drawable icon;
+                        try {
+                            icon = packageManager.getApplicationIcon(app);
+                        } catch (Exception e) {
+                            // If there's an error loading the icon, use a default icon
+                            icon = getResources().getDrawable(R.mipmap.ic_launcher, getTheme());
+                        }
+                        boolean isBlocked = blockedApps.contains(app.packageName);
 
-                    userApps.add(new AppInfo(appName, app.packageName, icon, isBlocked));
+                        userApps.add(new AppInfo(appName, app.packageName, icon, isBlocked));
+                    }
                 }
-            }
 
-            Collections.sort(userApps, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                Collections.sort(userApps, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
-            runOnUiThread(() -> {
-                adapter = new AppListAdapter(userApps, updatedBlockedApps -> {
-                    blockedApps = updatedBlockedApps;
-                    saveBlockedAppsToPrefs();
+                runOnUiThread(() -> {
+                    adapter = new AppListAdapter(userApps, updatedBlockedApps -> {
+                        blockedApps = updatedBlockedApps;
+                        saveBlockedAppsToPrefs();
+                    });
+                    recyclerView.setAdapter(adapter);
                 });
-                recyclerView.setAdapter(adapter);
             });
-        });
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        executor.shutdown();
+        if (executor != null) {
+            executor.shutdown();
+            executor = null;
+        }
     }
 }
