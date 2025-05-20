@@ -31,6 +31,7 @@ public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapte
     public interface OnScheduleUpdated {
         void onEdit(int position);
         void onDelete(int position);
+        void onScheduleUpdated();
     }
 
     private final List<FocusSchedule> schedules;
@@ -76,6 +77,11 @@ public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapte
 
         holder.editButton.setOnClickListener(v -> callback.onEdit(position));
         holder.deleteButton.setOnClickListener(v -> callback.onDelete(position));
+
+        holder.itemView.setOnClickListener(v -> {
+            // Handle edit click
+            callback.onScheduleUpdated();
+        });
     }
 
     @Override
@@ -93,5 +99,11 @@ public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapte
         if (displayHour == 0) displayHour = 12;
         String amPm = isPM ? "PM" : "AM";
         return String.format(Locale.getDefault(), "%d:%02d %s", displayHour, minute, amPm);
+    }
+
+    public void updateSchedules(List<FocusSchedule> newSchedules) {
+        this.schedules.clear();
+        this.schedules.addAll(newSchedules);
+        notifyDataSetChanged();
     }
 }

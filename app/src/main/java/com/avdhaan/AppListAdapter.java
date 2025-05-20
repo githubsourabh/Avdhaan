@@ -27,8 +27,8 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
 
         // Preload initially blocked apps
         for (AppInfo app : apps) {
-            if (app.isBlocked) {
-                blockedPackages.add(app.packageName);
+            if (app.isBlocked()) {
+                blockedPackages.add(app.getPackageName());
             }
         }
     }
@@ -58,19 +58,19 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         AppInfo app = appList.get(position);
 
-        holder.icon.setImageDrawable(app.icon);
-        holder.name.setText(app.name);
+        holder.icon.setImageDrawable(app.getIcon());
+        holder.name.setText(app.getName());
 
         // Avoid recycling issues
         holder.checkBox.setOnCheckedChangeListener(null);
-        holder.checkBox.setChecked(blockedPackages.contains(app.packageName));
+        holder.checkBox.setChecked(blockedPackages.contains(app.getPackageName()));
 
         holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            app.isBlocked = isChecked;
+            app.setBlocked(isChecked);
             if (isChecked) {
-                blockedPackages.add(app.packageName);
+                blockedPackages.add(app.getPackageName());
             } else {
-                blockedPackages.remove(app.packageName);
+                blockedPackages.remove(app.getPackageName());
             }
             onBlockedChanged.accept(new HashSet<>(blockedPackages));
         });

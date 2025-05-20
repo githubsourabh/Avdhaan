@@ -1,92 +1,160 @@
 <resources>
     <string name="app_name">Avdhaan</string>
+
+    <!-- Original strings -->
     <string name="accessibility_service_description">Avdhaan helps you stay focused by blocking distracting apps.</string>
     <string name="please_enable_accessibility">Please enable accessibility service for Avdhaan</string>
-    <string name="focus_mode_enabled">Focus Mode Enabled</string>
-    <string name="focus_mode_disabled">Focus Mode Disabled</string>
-    <string name="end_time_must_be_after_start">End time must be after start time</string>
-    <string name="select_at_least_one_day">Select at least one day</string>
-    <string name="schedule_saved">Schedule saved successfully</string>
-    <string name="delete_schedule">Delete Schedule</string>
-    <string name="delete_schedule_confirm">Are you sure you want to delete this schedule?</string>
-    <string name="cancel">Cancel</string>
-    <string name="BTN_SET_FOCUS_SCH">Set Focus Schedule</string>
-    <string name="WELCOME_MSG">Welcome to Avdhaan!</string>
-    <string name="blocked_apps_updated">Blocked apps list updated</string>
+    <string name="no_apps_selected">No apps selected for blocking.</string>
+    <string name="focus_mode_active">Focus Mode is currently active.</string>
+    <string name="focus_mode_inactive">Focus Mode is currently inactive.</string>
+    <string name="enable_focus_mode">Enable Focus Mode</string>
+    <string name="disable_focus_mode">Disable Focus Mode</string>
+    <string name="schedule_saved">Schedule saved successfully.</string>
+    <string name="no_schedules">No schedules available.</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="btn_set_focus_sch">Set Focus Schedule</string>
+    <string name="btn_add_sch">Add Schedule</string>
+    <string name="no_schedules_yet">No schedules yet. Click below to add one.</string>
+    <string name="usage_logs">Usage Logs</string>
 
-    <string name="TXT_CONF_DEL_ALL_SCH">Are you sure you want to delete all schedules?</string>
-    <string name="BTN_CLR_ALL_SCH">Clear All Schedules</string>
-    <string name="friday">Friday</string>
+    <!-- Days of week -->
     <string name="monday">Monday</string>
-    <string name="no">No</string>
-    <string name="pm">PM</string>
-    <string name="saturday">Saturday</string>
-    <string name="schedule_overlaps_with_an_existing_one">Schedule overlaps with an existing one</string>
-    <string name="service_interrupted">Service Interrupted</string>
-    <string name="service_connected">Service connected</string>
-    <string name="sunday">Sunday</string>
-    <string name="thursday">Thursday</string>
     <string name="tuesday">Tuesday</string>
-    <string name="unknown">Unknown</string>
     <string name="wednesday">Wednesday</string>
-    <string name="yes">Yes</string>
-    <string name="blockedapps">blockedApps</string>
-    <string name="day">day</string>
-    <string name="editscheduleindex">editScheduleIndex</string>
-    <string name="focusenabled">focusEnabled</string>
-    <string name="focusmodeenabled">focusModeEnabled</string>
-    <string name="focus_schedules_dat">focus_schedules.dat</string>
+    <string name="thursday">Thursday</string>
+    <string name="friday">Friday</string>
+    <string name="saturday">Saturday</string>
+    <string name="sunday">Sunday</string>
 
-    <string name="BTN_ADD_SCH">Add New Schedule</string>
-    <string name="NO_SCHEDULES_YET">No schedules yet</string>
-    <string name="APP_BLOCKED_MSG">🚫 This app is blocked by Avdhaan</string>
+    <!-- Onboarding flow strings -->
+    <string name="welcome_title">Welcome to Avdhaan</string>
+    <string name="welcome_message">Stay focused and productive. Let\'s set things up.</string>
+    <string name="get_started">Get Started</string>
+
+    <string name="grant_accessibility_title">Grant Accessibility Access</string>
+    <string name="grant_accessibility_message">To help you stay focused, we need accessibility access to monitor and block distracting apps. This permission is essential for the app to work properly.</string>
+    <string name="grant_access">Grant Access</string>
+    <string name="skip_access">Skip for Now</string>
+
+    <string name="congrats_title">Great!</string>
+    <string name="congrats_message">You\'re almost ready. Now select the apps you want to restrict.</string>
+    <string name="select_apps">Select Apps</string>
+
+    <string name="schedule_prompt_title">Set Your Schedule</string>
+    <string name="schedule_prompt_message">Define when to block selected apps.</string>
+    <string name="proceed_to_schedule">Proceed to Scheduling</string>
+
+    <string name="usage_only_mode_title">Usage Monitoring</string>
+    <string name="usage_only_mode_message">Without accessibility access, Avdhaan can still monitor your app usage.</string>
+    <string name="grant_usage_access">Grant Usage Access</string>
+    <string name="decline_usage_access">No, Thanks</string>
+
+    <string name="all_set_title">All Set!</string>
+    <string name="all_set_message">You\'re ready to use Avdhaan.</string>
+    <string name="go_to_dashboard">Go to Dashboard</string>
+
+    <string name="not_ready_title">Not Ready?</string>
+    <string name="not_ready_message">You can grant access anytime from settings.</string>
+    <string name="finish">Finish</string>
+
+    <!-- Button strings -->
+    <string name="button_proceed_schedule">Proceed to Schedule</string>
+    <string name="button_proceed_to_main">Proceed to Main</string>
+    <string name="button_proceed_anyway">Proceed Anyway</string>
+    <string name="button_select_apps">Select Apps</string>
+    <string name="button_go_to_main">Go to Main</string>
+    <string name="button_grant_permission">Grant Permission</string>
+    <string name="button_proceed_after_permission">Proceed</string>
+    <string name="button_grant_usage_access">Grant Usage Access</string>
+    <string name="button_decline_usage_access">No, Thanks</string>
+    <string name="button_agree_grant_usage_access">Grant Access</string>
+    <string name="button_decline_grant_usage_access">Not Now</string>
+    <string name="exit_button">Exit</string>
+    <string name="final_onboarding_message">You\'re all set to use Avdhaan!</string>
+    <string name="button_continue_to_main">Continue to Main</string>
+
+    <!-- Block Screen -->
+    <string name="APP_BLOCKED_MSG">This app is blocked during focus mode</string>
     <string name="BTN_GO_BACK">Go Back</string>
+
+    <!-- Main Activity -->
+    <string name="usage_tracking_title">Usage Tracking</string>
+    <string name="usage_tracking_description">Track your app usage to understand your habits</string>
+    <string name="usage_tracking_switch">Enable Usage Tracking</string>
+    <string name="WELCOME_MSG">Welcome to Avdhaan</string>
     <string name="SWITCH_FOCUS_MODE">Focus Mode</string>
+    <string name="BTN_SET_FOCUS_SCH">Set Focus Schedule</string>
     <string name="BTN_SELECT_APPS_TO_BLK">Select Apps to Block</string>
+
+    <!-- Schedule Activity -->
     <string name="TXTVIEW_START_TIME">Start Time</string>
     <string name="TXTVIEW_END_TIME">End Time</string>
-    <string name="TXTVIEW_REPEAT_ON">Repeat on:</string>
-    <string name="BTN_SAVE_SCH">Save Schedule</string>
-
+    <string name="TXTVIEW_REPEAT_ON">Repeat On</string>
     <string name="TGL_SUN">Sun</string>
     <string name="TGL_MON">Mon</string>
     <string name="TGL_TUE">Tue</string>
     <string name="TGL_WED">Wed</string>
     <string name="TGL_THU">Thu</string>
     <string name="TGL_FRI">Fri</string>
-    <string name="TGL_SAT">SAT</string>
+    <string name="TGL_SAT">Sat</string>
 
-    <string name="MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG">Accessibility service is disabled. Focus Mode turned off.</string>
+    <!-- Schedule List -->
+    <string name="NO_SCHEDULES_YET">No schedules yet. Click below to add one.</string>
+    <string name="BTN_ADD_SCH">Add Schedule</string>
+    <string name="BTN_CLR_ALL_SCH">Clear All Schedules</string>
+    <string name="BTN_SAVE_SCH">Save Schedule</string>
 
-    <!-- Usage Tracking -->
-    <string name="usage_tracking_title">Usage Tracking</string>
-    <string name="usage_tracking_description">Enable to get insights about your app usage</string>
-    <string name="usage_tracking_switch">Track app usage</string>
-    
     <!-- Usage Tracking Dialog -->
-    <string name="usage_tracking_benefits_title">Enable usage tracking to:</string>
-    <string name="usage_tracking_benefit_1">See detailed app usage statistics</string>
-    <string name="usage_tracking_benefit_2">Get insights about your digital habits</string>
-    <string name="usage_tracking_benefit_3">Improve your focus and productivity</string>
-    <string name="usage_tracking_benefit_4">Receive personalized recommendations</string>
-    <string name="usage_tracking_change_anytime">You can change this setting anytime in the app.</string>
-    <string name="enable_tracking">Enable tracking</string>
-    <string name="disable_tracking">No, thanks</string>
+    <string name="usage_tracking_benefits_title">Benefits of Usage Tracking</string>
+    <string name="usage_tracking_benefit_1">• Understand your app usage patterns</string>
+    <string name="usage_tracking_benefit_2">• Identify time-wasting apps</string>
+    <string name="usage_tracking_benefit_3">• Track your productivity improvements</string>
+    <string name="usage_tracking_benefit_4">• Get insights to help you focus better</string>
+    <string name="usage_tracking_change_anytime">You can change this setting anytime in the app</string>
+    <string name="disable_tracking">No Thanks</string>
+    <string name="enable_tracking">Enable Tracking</string>
 
-    <!-- Notifications -->
-    <string name="usage_access_removed_title">Usage Access Removed</string>
-    <string name="usage_access_removed_message">Tap to restore usage access permission</string>
-    <string name="enable_usage_access">Enable Access</string>
+    <!-- Notifications and Messages -->
     <string name="usage_access_restored_title">Usage Access Restored</string>
-    <string name="usage_access_restored_message">Usage tracking has been re-enabled</string>
-
-    <!-- Permission Dialogs -->
-    <string name="usage_access_required_title">Usage Access Required</string>
-    <string name="usage_access_required_message">Please enable usage access to track app usage</string>
-    <string name="open_settings">Open Settings</string>
-
-    <!-- Toast Messages -->
+    <string name="usage_access_restored_message">App usage tracking has been re-enabled</string>
+    <string name="usage_access_removed_title">Usage Access Removed</string>
+    <string name="usage_access_removed_message">App usage tracking has been disabled</string>
+    <string name="enable_usage_access">Enable Usage Access</string>
+    <string name="MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG">Please disable focus mode as accessibility service is not enabled</string>
+    <string name="focus_mode_enabled">Focus mode enabled</string>
+    <string name="focus_mode_disabled">Focus mode disabled</string>
     <string name="tracking_enabled">Usage tracking enabled</string>
     <string name="tracking_disabled">Usage tracking disabled</string>
+    <string name="open_settings">Open Settings</string>
+    <string name="usage_access_required_title">Usage Access Required</string>
+    <string name="usage_access_required_message">Please grant usage access to continue</string>
+    <string name="blocked_apps_updated">Blocked apps updated</string>
 
+    <!-- Schedule Validation -->
+    <string name="end_time_must_be_after_start">End time must be after start time</string>
+    <string name="schedule_overlaps_with_an_existing_one">This schedule overlaps with an existing one</string>
+    <string name="select_at_least_one_day">Please select at least one day</string>
+    <string name="TXT_CONF_DEL_ALL_SCH">Are you sure you want to delete all schedules?</string>
+    <string name="delete_schedule">Delete Schedule</string>
+    <string name="delete_schedule_confirm">Are you sure you want to delete this schedule?</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="accessibility_service_name">com.avdhaan/.AppBlockService</string>
+
+    <string name="select_apps_message">Select the apps you want to block during focus mode</string>
+    <string name="button_select_all">Select All</string>
+    <string name="button_deselect_all">Deselect All</string>
+    <string name="start_time">Start Time</string>
+    <string name="end_time">End Time</string>
+    <string name="repeat_days">Repeat on</string>
+
+    <string name="manage_schedules">Manage Schedules</string>
+    <string name="set_your_focus_schedule">Set Your Focus Schedule</string>
+    <string name="save_schedule">Save Schedule</string>
+    <string name="next">Next</string>
+
+    <string name="schedule_blocking_setup">Schedule Blocking Setup</string>
+    <string name="schedule_blocking_description">Your schedule blocking has been set up successfully. You can now manage your schedules and blocked apps from the main screen.</string>
+    <string name="proceed_to_main">Proceed to Main Screen</string>
 </resources>

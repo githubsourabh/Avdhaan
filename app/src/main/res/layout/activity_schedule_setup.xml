@@ -8,7 +8,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/manage_schedules"
+        android:text="@string/set_your_focus_schedule"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="24dp"/>
@@ -96,12 +96,12 @@
         android:text="@string/save_schedule"
         android:layout_marginTop="24dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/scheduleList"
+    <Button
+        android:id="@+id/nextButton"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="24dp"/>
+        android:layout_height="wrap_content"
+        android:text="@string/next"
+        android:enabled="false"
+        android:layout_marginTop="16dp"/>
 
-</LinearLayout>
-
+</LinearLayout> 

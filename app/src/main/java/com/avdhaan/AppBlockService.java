@@ -30,6 +30,19 @@ public class AppBlockService extends AccessibilityService {
         prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         blockedPrefs = getSharedPreferences(BLOCKED_PREFS_NAME, MODE_PRIVATE);
         Log.d(TAG, "Service created");
+        loadBlockedApps();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Disable focus mode when service is destroyed
+        if (prefs != null) {
+            prefs.edit().putBoolean(KEY_FOCUS_MODE, false).apply();
+            Log.d(TAG, "Focus mode disabled in onDestroy");
+        }
+        isServiceConnected = false;
+        Log.d(TAG, "Service destroyed");
     }
 
     private boolean isFocusModeOn() {
@@ -44,10 +57,19 @@ public class AppBlockService extends AccessibilityService {
         isServiceConnected = true;
         loadBlockedApps();
         Log.d(TAG, "Service connected. Blocked apps count: " + blockedApps.size());
+        Log.d(TAG, "Focus mode state: " + (isFocusModeOn() ? "ON" : "OFF"));
         
         // Send broadcast to notify that service is connected
         Intent intent = new Intent("com.avdhaan.SERVICE_CONNECTED");
         sendBroadcast(intent);
+    }
+
+    @Override
+    public boolean onUnbind(Intent intent) {
+        isServiceConnected = false;
+        // Don't disable focus mode on unbind, as the service might be temporarily unbound
+        Log.d(TAG, "Service unbound");
+        return super.onUnbind(intent);
     }
 
     private void loadBlockedApps() {
@@ -130,22 +152,6 @@ public class AppBlockService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-        Log.d(TAG, "Service Interrupted");
-        isServiceConnected = false;
-        
-        // Try to restart the service
-        Intent intent = new Intent(this, AppBlockService.class);
-        startService(intent);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        isServiceConnected = false;
-        Log.d(TAG, "Service Destroyed");
-        
-        // Try to restart the service
-        Intent intent = new Intent(this, AppBlockService.class);
-        startService(intent);
+        Log.d(TAG, "Service interrupted");
     }
 }

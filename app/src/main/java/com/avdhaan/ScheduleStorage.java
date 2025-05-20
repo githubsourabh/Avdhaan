@@ -1,51 +1,44 @@
 package com.avdhaan;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
-import java.io.*;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ScheduleStorage {
     private static final String TAG = "ScheduleStorage";
-    private static final String FILE_NAME = "focus_schedules.dat";
-    private static volatile List<FocusSchedule> cachedSchedules = null;
+    private static final String PREFS_NAME = "SchedulePrefs";
+    private static final String KEY_SCHEDULES = "schedules";
 
-    public static synchronized void saveSchedules(Context context, List<FocusSchedule> schedules) {
-        File file = new File(context.getFilesDir(), FILE_NAME);
-        try (ObjectOutputStream out = new ObjectOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
-            out.writeObject(new ArrayList<>(schedules)); // Create defensive copy
-            cachedSchedules = new ArrayList<>(schedules);
-        } catch (IOException e) {
-            Log.e(TAG, "Error saving schedules", e);
-            clearCache(); // Invalidate cache on error
-        }
+    public static void saveSchedules(Context context, List<FocusSchedule> schedules) {
+        Log.d(TAG, "Saving " + schedules.size() + " schedules");
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = gson.toJson(schedules);
+        Log.d(TAG, "Serialized schedules: " + json);
+        prefs.edit().putString(KEY_SCHEDULES, json).apply();
+        Log.d(TAG, "Schedules saved successfully");
     }
 
-    public static synchronized List<FocusSchedule> loadSchedules(Context context) {
-        if (cachedSchedules != null) {
-            return new ArrayList<>(cachedSchedules);
-        }
-
-        File file = new File(context.getFilesDir(), FILE_NAME);
-        if (!file.exists()) {
-            cachedSchedules = new ArrayList<>();
+    public static List<FocusSchedule> loadSchedules(Context context) {
+        Log.d(TAG, "Loading schedules");
+        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        String json = prefs.getString(KEY_SCHEDULES, null);
+        Log.d(TAG, "Loaded JSON: " + json);
+        
+        if (json == null) {
+            Log.d(TAG, "No schedules found, returning empty list");
             return new ArrayList<>();
         }
 
-        try (ObjectInputStream in = new ObjectInputStream(new BufferedInputStream(new FileInputStream(file)))) {
-            @SuppressWarnings("unchecked")
-            List<FocusSchedule> schedules = (List<FocusSchedule>) in.readObject();
-            cachedSchedules = new ArrayList<>(schedules);
-            return new ArrayList<>(schedules);
-        } catch (IOException | ClassNotFoundException e) {
-            Log.e(TAG, "Error loading schedules", e);
-            clearCache(); // Invalidate cache on error
-            return new ArrayList<>();
-        }
-    }
-
-    public static synchronized void clearCache() {
-        cachedSchedules = null;
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<FocusSchedule>>(){}.getType();
+        List<FocusSchedule> schedules = gson.fromJson(json, type);
+        Log.d(TAG, "Loaded " + schedules.size() + " schedules");
+        return schedules;
     }
 }

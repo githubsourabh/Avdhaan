@@ -88,6 +88,13 @@ public class ScheduleListActivity extends AppCompatActivity {
                 adapter.notifyItemRemoved(position);
                 loadAndDisplaySchedules();  // Refresh after delete
             }
+
+            @Override
+            public void onScheduleUpdated() {
+                // Refresh the list
+                List<FocusSchedule> updatedSchedules = ScheduleStorage.loadSchedules(ScheduleListActivity.this);
+                adapter.updateSchedules(updatedSchedules);
+            }
         });
 
         scheduleList.setLayoutManager(new LinearLayoutManager(this));

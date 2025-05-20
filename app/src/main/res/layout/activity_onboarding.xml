@@ -12,7 +12,7 @@
         android:id="@+id/onboarding_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Welcome to Avdhaan"
+        android:text="@string/welcome_title"
         android:textSize="24sp"
         android:textStyle="bold"
         android:paddingBottom="16dp"
@@ -22,7 +22,7 @@
         android:id="@+id/onboarding_message"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Stay focused and block distractions."
+        android:text="@string/welcome_message"
         android:textSize="16sp"
         android:textColor="@android:color/black"
         android:paddingBottom="24dp" />
@@ -31,6 +31,6 @@
         android:id="@+id/button_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Get Started" />
+        android:text="@string/get_started" />
 
 </LinearLayout>

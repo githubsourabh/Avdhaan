@@ -67,18 +67,22 @@ public class SelectAppsActivity extends AppCompatActivity {
             String currentPackage = getPackageName();
 
             for (ApplicationInfo app : installedApps) {
-                if (packageManager.getLaunchIntentForPackage(app.packageName) != null &&
-                        !app.packageName.equals(currentPackage)) {
-
+                if (packageManager.getLaunchIntentForPackage(app.packageName) != null) {
                     String appName = packageManager.getApplicationLabel(app).toString();
-                    Drawable icon = packageManager.getApplicationIcon(app);
+                    Drawable icon;
+                    try {
+                        icon = packageManager.getApplicationIcon(app);
+                    } catch (Exception e) {
+                        // If there's an error loading the icon, use a default icon
+                        icon = getResources().getDrawable(R.mipmap.ic_launcher, getTheme());
+                    }
                     boolean isBlocked = blockedApps.contains(app.packageName);
 
                     userApps.add(new AppInfo(appName, app.packageName, icon, isBlocked));
                 }
             }
 
-            Collections.sort(userApps, (a, b) -> a.name.compareToIgnoreCase(b.name));
+            Collections.sort(userApps, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
 
             runOnUiThread(() -> {
                 adapter = new AppListAdapter(userApps, updatedBlockedApps -> {
