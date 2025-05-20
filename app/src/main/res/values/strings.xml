@@ -121,7 +121,7 @@
     <string name="usage_access_removed_title">Usage Access Removed</string>
     <string name="usage_access_removed_message">App usage tracking has been disabled</string>
     <string name="enable_usage_access">Enable Usage Access</string>
-    <string name="MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG">Please disable focus mode as accessibility service is not enabled</string>
+    <string name="MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG">Please disable focus mode as accessibility service is not enabled</string>  //Not used. Delete it
     <string name="focus_mode_enabled">Focus mode enabled</string>
     <string name="focus_mode_disabled">Focus mode disabled</string>
     <string name="tracking_enabled">Usage tracking enabled</string>
@@ -159,4 +159,9 @@
     <string name="proceed_to_main">Proceed to Main Screen</string>
 
     <string name="accessibility_service_summary">Service to block apps during focus mode</string>
+
+    <string name="focus_mode_disabled_title">Focus Mode Disabled</string>
+    <string name="focus_mode_disabled_message">Avdhaan wasn\'t shut down properly. Focus Mode has been turned off. Please enable it again.</string>
+    <string name="ok">OK</string>
+
 </resources>

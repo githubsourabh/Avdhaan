@@ -22,6 +22,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.avdhaan.db.AppUsageLogger;
 import com.avdhaan.worker.UsageLoggingScheduler;
 
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -81,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 permissionManager.checkAndUpdatePermissionState();
             }
         };
-        
+
         // Register the observer for settings changes
         getContentResolver().registerContentObserver(
             Settings.Secure.CONTENT_URI,
@@ -133,7 +134,15 @@ public class MainActivity extends AppCompatActivity {
             focusSwitch.setChecked(false);
             if (isFocusOn) {
                 saveFocusModeState(false);
-                Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
+
+                // Enhancement: Show warning popup if focus mode was ON but accessibility is OFF
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.focus_mode_disabled_title))
+                        .setMessage(getString(R.string.focus_mode_disabled_message))
+                        .setPositiveButton(getString(R.string.ok), null)
+                        .setCancelable(false)
+                        .show();
+
             }
         }
 
@@ -217,7 +226,17 @@ public class MainActivity extends AppCompatActivity {
         if (!isAccessibilityOn && isFocusOn) {
             focusSwitch.setChecked(false);
             saveFocusModeState(false);
-            Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
+            // Enhancement: Show warning popup if focus mode was ON but accessibility is OFF
+
+                new AlertDialog.Builder(this)
+                        .setTitle(getString(R.string.focus_mode_disabled_title))
+                        .setMessage(getString(R.string.focus_mode_disabled_message))
+                        .setPositiveButton(getString(R.string.ok), null)
+                        .setCancelable(false)
+                        .show();
+
+
         } else {
             focusSwitch.setChecked(isFocusOn);
         }
