@@ -1,6 +1,8 @@
 package com.avdhaan;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -13,22 +15,31 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-public class AppSelectionActivity extends AppCompatActivity {
-    private static final String TAG = "AppSelectionActivity";
+public class OnboardingAppSelectionActivity extends AppCompatActivity {
+    private static final String TAG = "OnboardingAppSelection";
+    private static final String PREFS_NAME = "BlockedPrefs";
+    private static final String BLOCKED_APPS_KEY = "blockedApps";
+    
     protected RecyclerView recyclerView;
     protected AppAdapter appAdapter;
     protected List<AppInfo> appList;
     protected Button buttonSelectAll;
     protected Button buttonDeselectAll;
     protected Button buttonProceed;
+    protected SharedPreferences prefs;
+    protected Set<String> blockedApps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_selection);
 
+        prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        loadBlockedAppsFromPrefs();
         setupViews();
     }
 
@@ -78,7 +89,7 @@ public class AppSelectionActivity extends AppCompatActivity {
                 return;
             }
 
-            // Save selected apps to preferences or database
+            // Save selected apps to preferences
             saveSelectedApps(selectedApps);
 
             // Call the protected method for navigation
@@ -93,44 +104,20 @@ public class AppSelectionActivity extends AppCompatActivity {
 
     protected void loadApps() {
         PackageManager pm = getPackageManager();
-        List<ApplicationInfo> packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        Log.d(TAG, "Total installed apps: " + packages.size());
-        
-        appList.clear(); // Clear the list before adding new apps
-        
-        for (ApplicationInfo packageInfo : packages) {
-            // Skip our own app
-            if (packageInfo.packageName.equals(getPackageName())) {
-                continue;
-            }
+        appList = AppListUtils.loadApps(this, pm);
+        Log.d(TAG, "Total apps loaded: " + appList.size());
+    }
 
-            try {
-                // Only skip system apps that are not launchable
-                if ((packageInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-                    if (pm.getLaunchIntentForPackage(packageInfo.packageName) == null) {
-                        continue;
-                    }
-                }
-
-                String appName = pm.getApplicationLabel(packageInfo).toString();
-                AppInfo app = new AppInfo(
-                    appName,
-                    packageInfo.packageName,
-                    pm.getApplicationIcon(packageInfo)
-                );
-                appList.add(app);
-                Log.d(TAG, "Added app: " + appName + " (" + packageInfo.packageName + ")");
-            } catch (Exception e) {
-                Log.e(TAG, "Error loading app: " + packageInfo.packageName, e);
-            }
-        }
-        
-        Log.d(TAG, "Total apps added to list: " + appList.size());
+    private void loadBlockedAppsFromPrefs() {
+        Set<String> savedSet = prefs.getStringSet(BLOCKED_APPS_KEY, new HashSet<>());
+        blockedApps = new HashSet<>(savedSet != null ? savedSet : new HashSet<>());
     }
 
     protected void saveSelectedApps(List<String> selectedApps) {
-        // TODO: Implement saving selected apps to preferences or database
-        // For now, we'll just log them
-        Log.d(TAG, "Selected apps: " + selectedApps);
+        // Save to the same SharedPreferences as SelectAppsActivity
+        prefs.edit()
+            .putStringSet(BLOCKED_APPS_KEY, new HashSet<>(selectedApps))
+            .apply();
+        Log.d(TAG, "Saved selected apps: " + selectedApps);
     }
 }

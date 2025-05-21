@@ -13,6 +13,14 @@ public class BlockScreenActivity extends Activity {
 
     public static boolean isShowing = false;
 
+    public static boolean isShowing(android.content.Context context) {
+        return isShowing;
+    }
+
+    public static void setShowing(android.content.Context context, boolean showing) {
+        isShowing = showing;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
@@ -59,7 +67,12 @@ public class BlockScreenActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        // Prevent exiting by back button
+        // Go to home screen when back is pressed
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish(); // Finish this activity
     }
 }
 

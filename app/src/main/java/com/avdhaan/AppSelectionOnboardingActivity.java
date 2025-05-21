@@ -3,7 +3,7 @@ package com.avdhaan;
 import android.content.Intent;
 import android.os.Bundle;
 
-public class AppSelectionOnboardingActivity extends AppSelectionActivity {
+public class AppSelectionOnboardingActivity extends OnboardingAppSelectionActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -31,6 +31,7 @@ import java.util.concurrent.Executors;
 import static com.avdhaan.PreferenceConstants.*;
 
 public class MainActivity extends AppCompatActivity {
+    private static final String TAG = "MainActivity";
 
     private static final String PREFS_NAME = "FocusPrefs";
     private static final String KEY_FOCUS_MODE = "focusEnabled";
@@ -163,18 +164,16 @@ public class MainActivity extends AppCompatActivity {
             if (isChecked) {
                 if (!isAccessibilityEnabled()) {
                     Toast.makeText(this, getString(R.string.please_enable_accessibility), Toast.LENGTH_LONG).show();
-                    requestedAccessibilityEnable = true;  // Use new flag
+                    requestedAccessibilityEnable = true;
                     focusSwitch.setChecked(false);
                     Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
                     startActivity(intent);
                 } else {
                     saveFocusModeState(true);
-                    startAppBlockService();
                     Toast.makeText(this, getString(R.string.focus_mode_enabled), Toast.LENGTH_SHORT).show();
                 }
             } else {
                 saveFocusModeState(false);
-                stopAppBlockService();
                 Toast.makeText(this, getString(R.string.focus_mode_disabled), Toast.LENGTH_SHORT).show();
             }
         });
@@ -313,5 +312,36 @@ public class MainActivity extends AppCompatActivity {
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
                 android.os.Process.myUid(), context.getPackageName());
         return mode == AppOpsManager.MODE_ALLOWED;
+    }
+
+    private void checkAccessibilityState() {
+        boolean isAccessibilityOn = isAccessibilityEnabled();
+        boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .getBoolean(KEY_FOCUS_MODE, false);
+        
+        Log.d(TAG, "Accessibility state: " + (isAccessibilityOn ? "ON" : "OFF"));
+        Log.d(TAG, "Focus mode state: " + (isFocusOn ? "ON" : "OFF"));
+        
+        if (!isAccessibilityOn) {
+            // If accessibility is off, disable focus mode
+            if (isFocusOn) {
+                focusSwitch.setChecked(false);
+                saveFocusModeState(false);
+                Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
+            }
+            // Show the accessibility prompt
+            showAccessibilityPrompt();
+        } else {
+            // If accessibility is on, restore focus mode state from preferences
+            boolean savedFocusState = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                    .getBoolean(KEY_FOCUS_MODE, false);
+            if (savedFocusState != isFocusOn) {
+                focusSwitch.setChecked(savedFocusState);
+            }
+        }
+    }
+
+    private void showAccessibilityPrompt() {
+        // Implementation of showAccessibilityPrompt method
     }
 }

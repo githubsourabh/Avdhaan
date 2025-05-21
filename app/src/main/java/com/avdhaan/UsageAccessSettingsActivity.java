@@ -33,7 +33,7 @@ public class UsageAccessSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 // After granting access, proceed to app selection
-                Intent intent = new Intent(UsageAccessSettingsActivity.this, AppSelectionActivity.class);
+                Intent intent = new Intent(UsageAccessSettingsActivity.this, OnboardingAppSelectionActivity.class);
                 startActivity(intent);
                 finish();
             }

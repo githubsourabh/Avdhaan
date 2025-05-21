@@ -7,6 +7,8 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Required to receive BOOT_COMPLETED - MOVED HERE -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:allowBackup="true"
@@ -53,7 +55,16 @@
         <activity android:name=".UsageAccessInfoActivity" />
         <activity android:name=".AccessDeniedInfoActivity" />
         <activity android:name=".UsageAccessSettingsActivity" />
-        <activity android:name=".BlockScreenActivity" />
+        
+        <activity
+            android:name=".BlockScreenActivity"
+            android:theme="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen"
+            android:excludeFromRecents="true"
+            android:taskAffinity=""
+            android:launchMode="singleTask"
+            android:exported="true">
+        </activity>
+        
         <activity android:name=".onboarding.WelcomeActivity" />
         <activity android:name=".UsageAccessDeclinedInfoActivity" />
         <activity android:name=".PermissionIntroActivity" />
@@ -69,7 +80,7 @@
         <service
             android:name=".AppBlockService"
             android:enabled="true"
-            android:exported="false"
+            android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />
@@ -88,8 +99,9 @@
             </intent-filter>
         </receiver>
 
-        <!-- Alarm Receiver (for future scheduling) -->
-        <receiver android:name=".AlarmReceiver" />
+        <!-- Alarm Receivers -->
+        <receiver android:name=".FocusAlarmReceiver" android:exported="true"/>
+        <receiver android:name=".FocusEndReceiver" android:exported="false" />
 
     </application>
 </manifest>
