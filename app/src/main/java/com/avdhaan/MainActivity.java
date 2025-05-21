@@ -103,17 +103,22 @@ public class MainActivity extends AppCompatActivity {
         usageTrackingSwitch = findViewById(R.id.switch_usage_tracking);
         boolean isTrackingEnabled = trackingPreferences.isTrackingEnabled();
         usageTrackingSwitch.setChecked(isTrackingEnabled);
+        Log.d("MainActivity in setupUsageTracking called by onCreate", "Usage tracking is " + (isTrackingEnabled ? "enabled" : "disabled"));
 
         usageTrackingSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            if (isChecked && !permissionManager.hasUsageStatsPermission()) {
-                // Need to request permission
-                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                startActivity(intent);
-                requestedUsageEnable = true;  // Use renamed flag
-                // Don't update preferences yet, wait for onResume
-                usageTrackingSwitch.setChecked(false);
+            if (isChecked) {
+                if (!permissionManager.hasUsageStatsPermission()) {
+                    // Need to request permission
+                    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+                    startActivity(intent);
+                    requestedUsageEnable = true;
+                    // Don't update preferences yet, wait for onResume
+                    usageTrackingSwitch.setChecked(false);
+                } else {
+                    updateUsageTracking(true);  // ✅ Save enabled state
+                }
             } else {
-                updateUsageTracking(isChecked);
+                updateUsageTracking(false);     // ✅ Save disabled state
             }
         });
     }
