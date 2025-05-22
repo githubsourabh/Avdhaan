@@ -25,7 +25,6 @@ import static com.avdhaan.PreferenceConstants.*;
 
 public class SelectAppsActivity extends AppCompatActivity {
 
-    private static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
     private static final String TAG = "SelectAppsActivity";
     private ExecutorService executor;
 

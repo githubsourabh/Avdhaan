@@ -16,7 +16,6 @@ import static com.avdhaan.PreferenceConstants.*;
 public class AppBlockService extends AccessibilityService {
 
     private static final String TAG = "AppBlockService";
-    private static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
 
     private Set<String> blockedApps = new HashSet<>();
     private SharedPreferences prefs;

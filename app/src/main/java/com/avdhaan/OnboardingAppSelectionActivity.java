@@ -23,7 +23,6 @@ import static com.avdhaan.PreferenceConstants.*;
 
 public class OnboardingAppSelectionActivity extends AppCompatActivity {
     private static final String TAG = "OnboardingAppSelection";
-    private static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
     
     protected RecyclerView recyclerView;
     protected AppAdapter appAdapter;

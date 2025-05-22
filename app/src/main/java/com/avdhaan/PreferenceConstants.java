@@ -3,6 +3,7 @@ package com.avdhaan;
 public class PreferenceConstants {
     // SharedPreferences file name
     public static final String PREF_NAME = "AvdhaanPrefs";
+    public static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
 
     // Onboarding keys
     public static final String KEY_FIRST_TIME = "isFirstTime";
