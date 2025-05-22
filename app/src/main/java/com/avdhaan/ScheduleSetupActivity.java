@@ -12,8 +12,6 @@ import static com.avdhaan.PreferenceConstants.*;
 
 public class ScheduleSetupActivity extends BaseScheduleActivity {
     private static final String TAG = "ScheduleSetupActivity";
-    private static final String ONBOARDING_PREFS = "AvdhaanPrefs";
-    private static final String KEY_FIRST_TIME = "isFirstTime";
 
     @Override
     protected int getLayoutResourceId() {
@@ -42,7 +40,7 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
             }
 
             // Mark onboarding as completed
-            SharedPreferences.Editor onboardingEditor = getSharedPreferences(ONBOARDING_PREFS, MODE_PRIVATE).edit();
+            SharedPreferences.Editor onboardingEditor = getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit();
             onboardingEditor.putBoolean(KEY_FIRST_TIME, false);
             onboardingEditor.apply();
             Log.d(TAG, "Onboarding marked as completed");
