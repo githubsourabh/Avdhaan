@@ -57,6 +57,8 @@ public class PermissionExplanationActivity extends AppCompatActivity {
         
         if (OnboardingUtils.hasAccessibilityPermission(this, serviceName)) {
             Log.d(TAG, "onResume: Accessibility permission granted, proceeding to next screen");
+            // Update preferences when accessibility is granted
+            OnboardingUtils.updateAccessibilityState(this);
             // If accessibility service is enabled, proceed to usage access permission
             Intent intent = new Intent(this, UsageAccessPermissionActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);

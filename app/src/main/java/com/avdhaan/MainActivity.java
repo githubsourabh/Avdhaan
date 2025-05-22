@@ -1,7 +1,5 @@
 package com.avdhaan;
 
-
-
 import android.app.AppOpsManager;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,6 +27,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static com.avdhaan.PreferenceConstants.*;
+//import com.avdhaan.OnboardingUtils;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
@@ -42,11 +41,13 @@ public class MainActivity extends AppCompatActivity {
     private Switch usageTrackingSwitch;
     private PermissionManager permissionManager;
     private UsageTrackingPreferences trackingPreferences;
-    private boolean requestedAccessibilityEnable = false;  // New flag for accessibility
-    private boolean requestedUsageEnable = false;         // Renamed flag for usage tracking
+    private boolean requestedAccessibilityEnable = false;
+    private boolean requestedUsageEnable = false;
 
     private ContentObserver permissionObserver;
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
+
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,30 +57,36 @@ public class MainActivity extends AppCompatActivity {
         permissionManager = new PermissionManager(getApplicationContext());
         trackingPreferences = new UsageTrackingPreferences(getApplicationContext());
 
-        // Set KEY_FIRST_TIME to false
-        SharedPreferences prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
-        prefs.edit().putBoolean(KEY_FIRST_TIME, false).apply();
+        // Initialize SharedPreferences
+        prefs = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
+        // Initialize UI components first
         setupPermissionObserver();
         setupUsageTracking();
         initializeFocusMode();
         initializeButtons();
 
+        // Check if coming from onboarding flow
+        if (prefs.getBoolean(KEY_FIRST_TIME, true)) {
+            // If accessibility was granted during onboarding, set focus mode ON
+            if (prefs.getBoolean(KEY_FOCUS_MODE, false)) {
+                focusSwitch.setChecked(true);
+                startAppBlockService();
+            }
+            
+            // If usage stats was granted during onboarding, set usage tracking ON
+            if (prefs.getBoolean(KEY_USAGE_TRACKING, false)) {
+                usageTrackingSwitch.setChecked(true);
+            }
+            
+            // Turn off first time flag since we've handled onboarding
+            prefs.edit().putBoolean(KEY_FIRST_TIME, false).apply();
+        }
+
         // Ensure logging is scheduled
         UsageLoggingScheduler.schedule(getApplicationContext());
 
         appUsageLogger = new AppUsageLogger(getApplicationContext());
-
-        // Check if we're coming from onboarding
-        boolean isFromOnboarding = getIntent().getBooleanExtra("from_onboarding", false);
-        if (isFromOnboarding) {
-            // Ensure focus mode is off when coming from onboarding
-            saveFocusModeState(false);
-            if (focusSwitch != null) {
-                focusSwitch.setChecked(false);
-            }
-            Log.d("MainActivity", "Initialized focus mode to OFF after onboarding");
-        }
     }
 
     private void setupPermissionObserver() {
@@ -116,15 +123,19 @@ public class MainActivity extends AppCompatActivity {
                     // Don't update preferences yet, wait for onResume
                     usageTrackingSwitch.setChecked(false);
                 } else {
-                    updateUsageTracking(true);  // ✅ Save enabled state
+                    updateUsageTracking(true);
                 }
             } else {
-                updateUsageTracking(false);     // ✅ Save disabled state
+                updateUsageTracking(false);
             }
         });
     }
 
     private void updateUsageTracking(boolean enabled) {
+        getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_USAGE_TRACKING, enabled)
+            .apply();
         trackingPreferences.setTrackingEnabled(enabled);
         if (enabled) {
             UsageLoggingScheduler.schedule(getApplicationContext());
@@ -148,15 +159,12 @@ public class MainActivity extends AppCompatActivity {
             focusSwitch.setChecked(false);
             if (isFocusOn) {
                 saveFocusModeState(false);
-
-                // Enhancement: Show warning popup if focus mode was ON but accessibility is OFF
                 new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.focus_mode_disabled_title))
                         .setMessage(getString(R.string.focus_mode_disabled_message))
                         .setPositiveButton(getString(R.string.ok), null)
                         .setCancelable(false)
                         .show();
-
             }
         }
 
@@ -302,9 +310,10 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveFocusModeState(boolean enabled) {
-        SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-        editor.putBoolean(KEY_FOCUS_MODE, enabled);
-        editor.apply();
+        getSharedPreferences(PREF_NAME, MODE_PRIVATE)
+            .edit()
+            .putBoolean(KEY_FOCUS_MODE, enabled)
+            .apply();
     }
 
     public static boolean hasUsageStatsPermission(Context context) {

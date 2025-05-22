@@ -35,6 +35,8 @@ public class UsageAccessPermissionActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         if (OnboardingUtils.hasUsageStatsPermission(this)) {
+            // Update preferences when usage stats permission is granted
+            OnboardingUtils.updateUsageStatsState(this);
             // Set tracking as enabled when permission is granted
             new UsageTrackingPreferences(this).setTrackingEnabled(true);
             startActivity(new Intent(this, AppSelectionOnboardingActivity.class));

@@ -40,13 +40,7 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
                 Toast.makeText(this, "Please save at least one schedule", Toast.LENGTH_SHORT).show();
                 return;
             }
-            
-            // Ensure focus mode is off when first setting up schedules
-            SharedPreferences.Editor editor = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit();
-            editor.putBoolean(KEY_FOCUS_MODE, false);
-            editor.apply();
-            Log.d(TAG, "Focus mode initialized to OFF for first-time setup");
-            
+
             // Mark onboarding as completed
             SharedPreferences.Editor onboardingEditor = getSharedPreferences(ONBOARDING_PREFS, MODE_PRIVATE).edit();
             onboardingEditor.putBoolean(KEY_FIRST_TIME, false);
