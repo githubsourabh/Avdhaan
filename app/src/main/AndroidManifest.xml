@@ -32,8 +32,15 @@
             </intent-filter>
         </activity>
 
+        <!-- Pre-MainActivity checkpoint -->
+        <activity android:name=".FinalActivityBeforeMainActivity" />
+
+        <!-- Main Activity -->
+        <activity 
+            android:name=".MainActivity"
+            android:exported="false" />
+
         <!-- Other activities -->
-        <activity android:name=".MainActivity" />
         <activity android:name=".SelectAppsActivity" />
         <activity android:name=".ScheduleListActivity" />
         <activity android:name=".ScheduleSetupActivity" />
@@ -48,7 +55,6 @@
         <activity android:name=".AppSelectionIntroActivity" />
         <activity android:name=".AppSelectionSuccessActivity" />
         <activity android:name=".ScheduleSetupSuccessActivity" />
-        <activity android:name=".FinalFallbackActivity" />
         <activity android:name=".AccessGrantedActivity" />
         <activity android:name=".PermissionExplanationActivity" />
         <activity android:name=".AccessNotGrantedInfoActivity" />

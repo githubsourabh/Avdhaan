@@ -21,7 +21,7 @@ public class FinalFallbackActivity extends AppCompatActivity {
         buttonProceedAnyway.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(FinalFallbackActivity.this, MainActivity.class);
+                Intent intent = new Intent(FinalFallbackActivity.this, FinalActivityBeforeMainActivity.class);
                 startActivity(intent);
                 finish();
             }

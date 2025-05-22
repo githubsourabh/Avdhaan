@@ -27,8 +27,8 @@ public class OnboardingActivity extends AppCompatActivity {
             boolean isFirstTime = prefs.getBoolean(KEY_FIRST_TIME, true);
 
             if (!isFirstTime) {
-                Log.d(TAG, "Not first time, redirecting to MainActivity");
-                Intent intent = new Intent(OnboardingActivity.this, MainActivity.class);
+                Log.d(TAG, "Not first time, redirecting to FinalActivityBeforeMainActivity");
+                Intent intent = new Intent(OnboardingActivity.this, FinalActivityBeforeMainActivity.class);
                 startActivity(intent);
                 finish();
                 return;

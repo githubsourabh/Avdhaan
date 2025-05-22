@@ -38,19 +38,12 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
                 Toast.makeText(this, "Please save at least one schedule", Toast.LENGTH_SHORT).show();
                 return;
             }
-
-            // Mark onboarding as completed
-            SharedPreferences.Editor onboardingEditor = getSharedPreferences(PREF_NAME, MODE_PRIVATE).edit();
-            onboardingEditor.putBoolean(KEY_FIRST_TIME, false);
-            onboardingEditor.apply();
-            Log.d(TAG, "Onboarding marked as completed");
             
-            // Navigate to main activity
-            Log.d(TAG, "Preparing to navigate to MainActivity");
-            Intent intent = new Intent(this, MainActivity.class);
+            // Navigate to final activity
+            Log.d(TAG, "Preparing to navigate to FinalActivityBeforeMainActivity");
+            Intent intent = new Intent(this, FinalActivityBeforeMainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.putExtra("from_onboarding", true);
-            Log.d(TAG, "Starting MainActivity with from_onboarding=true");
+            Log.d(TAG, "Starting FinalActivityBeforeMainActivity");
             startActivity(intent);
             Log.d(TAG, "Finishing ScheduleSetupActivity");
             finish();
