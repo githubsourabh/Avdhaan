@@ -32,8 +32,6 @@ import static com.avdhaan.PreferenceConstants.*;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private static final String PREFS_NAME = "FocusPrefs";
-    private static final String KEY_FOCUS_MODE = "focusEnabled";
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private AppUsageLogger appUsageLogger;
 
@@ -147,17 +145,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void initializeFocusMode() {
         focusSwitch = findViewById(R.id.focus_swtich);
-        boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                .getBoolean(KEY_FOCUS_MODE, false);
+        boolean isFocusOn = prefs.getBoolean(KEY_FOCUS_MODE, false);
+        Log.d(TAG, "initializeFocusMode: Initial focus state from prefs: " + isFocusOn);
 
         if (isAccessibilityEnabled()) {
             focusSwitch.setChecked(isFocusOn);
             if (isFocusOn) {
+                Log.d(TAG, "initializeFocusMode: Starting AppBlockService as focus is ON");
                 startAppBlockService();
             }
         } else {
+            Log.d(TAG, "initializeFocusMode: Accessibility not enabled, setting focus switch to false");
             focusSwitch.setChecked(false);
             if (isFocusOn) {
+                Log.d(TAG, "initializeFocusMode: Accessibility disabled but focus was ON, saving state as false");
                 saveFocusModeState(false);
                 new AlertDialog.Builder(this)
                         .setTitle(getString(R.string.focus_mode_disabled_title))
@@ -240,8 +241,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Handle focus mode state
         boolean isAccessibilityOn = isAccessibilityEnabled();
-        boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                .getBoolean(KEY_FOCUS_MODE, false);
+        boolean isFocusOn = prefs.getBoolean(KEY_FOCUS_MODE, false);
 
         if (!isAccessibilityOn && isFocusOn) {
             focusSwitch.setChecked(false);
@@ -310,8 +310,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveFocusModeState(boolean enabled) {
-        getSharedPreferences(PREF_NAME, MODE_PRIVATE)
-            .edit()
+        prefs.edit()
             .putBoolean(KEY_FOCUS_MODE, enabled)
             .apply();
     }
@@ -325,11 +324,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void checkAccessibilityState() {
         boolean isAccessibilityOn = isAccessibilityEnabled();
-        boolean isFocusOn = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                .getBoolean(KEY_FOCUS_MODE, false);
-        
-        Log.d(TAG, "Accessibility state: " + (isAccessibilityOn ? "ON" : "OFF"));
-        Log.d(TAG, "Focus mode state: " + (isFocusOn ? "ON" : "OFF"));
+        boolean isFocusOn = prefs.getBoolean(KEY_FOCUS_MODE, false);
         
         if (!isAccessibilityOn) {
             // If accessibility is off, disable focus mode
@@ -342,8 +337,7 @@ public class MainActivity extends AppCompatActivity {
             showAccessibilityPrompt();
         } else {
             // If accessibility is on, restore focus mode state from preferences
-            boolean savedFocusState = getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
-                    .getBoolean(KEY_FOCUS_MODE, false);
+            boolean savedFocusState = prefs.getBoolean(KEY_FOCUS_MODE, false);
             if (savedFocusState != isFocusOn) {
                 focusSwitch.setChecked(savedFocusState);
             }

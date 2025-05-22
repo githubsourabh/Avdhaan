@@ -6,6 +6,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -20,10 +21,11 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import static com.avdhaan.PreferenceConstants.*;
+
 public class SelectAppsActivity extends AppCompatActivity {
 
-    private static final String PREFS_NAME = "BlockedPrefs";
-    private static final String BLOCKED_APPS_KEY = "blockedApps";
+    private static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
     private static final String TAG = "SelectAppsActivity";
     private ExecutorService executor;
 
@@ -42,7 +44,7 @@ public class SelectAppsActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.apps_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         
-        prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs = getSharedPreferences(BLOCKED_PREFS_NAME, Context.MODE_PRIVATE);
         packageManager = getPackageManager();
 
         loadBlockedAppsFromPrefs();
@@ -50,15 +52,18 @@ public class SelectAppsActivity extends AppCompatActivity {
     }
 
     private void loadBlockedAppsFromPrefs() {
-        Set<String> savedSet = prefs.getStringSet(BLOCKED_APPS_KEY, new HashSet<>());
+        Set<String> savedSet = prefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
         blockedApps = new HashSet<>(savedSet != null ? savedSet : new HashSet<>());
     }
 
     private void saveBlockedAppsToPrefs() {
         prefs.edit()
-            .putStringSet(BLOCKED_APPS_KEY, new HashSet<>(blockedApps))
-            .apply();
+            .putStringSet(KEY_BLOCKED_APPS, new HashSet<>(blockedApps))
+            .commit();
         Toast.makeText(this, R.string.blocked_apps_updated, Toast.LENGTH_SHORT).show();
+        
+        Set<String> savedSet = prefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
+        Log.d(TAG, "Verified saved apps: " + savedSet);
     }
 
     private void loadInstalledApps() {

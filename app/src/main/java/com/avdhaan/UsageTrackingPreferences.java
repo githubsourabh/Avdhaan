@@ -3,20 +3,17 @@ package com.avdhaan;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-public class UsageTrackingPreferences {
-    private static final String PREFS_NAME = "usage_tracking_prefs";
-    private static final String KEY_TRACKING_ENABLED = "tracking_enabled";
-    private static final String KEY_FIRST_TIME_USER = "first_time_user";
-    private static final String KEY_PREVIOUS_TRACKING_STATE = "previous_tracking_state";
+import static com.avdhaan.PreferenceConstants.*;
 
+public class UsageTrackingPreferences {
     private final SharedPreferences prefs;
 
     public UsageTrackingPreferences(Context context) {
-        prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
     }
 
     public boolean isTrackingEnabled() {
-        return prefs.getBoolean(KEY_TRACKING_ENABLED, false);
+        return prefs.getBoolean(KEY_USAGE_TRACKING, false);
     }
 
     public void setTrackingEnabled(boolean enabled) {
@@ -24,11 +21,11 @@ public class UsageTrackingPreferences {
             // Store the previous state when disabling
             prefs.edit()
                 .putBoolean(KEY_PREVIOUS_TRACKING_STATE, isTrackingEnabled())
-                .putBoolean(KEY_TRACKING_ENABLED, false)
+                .putBoolean(KEY_USAGE_TRACKING, false)
                 .apply();
         } else {
             prefs.edit()
-                .putBoolean(KEY_TRACKING_ENABLED, true)
+                .putBoolean(KEY_USAGE_TRACKING, true)
                 .apply();
         }
     }

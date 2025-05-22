@@ -8,10 +8,10 @@ import android.widget.Button;
 import android.widget.Toast;
 import java.util.List;
 
+import static com.avdhaan.PreferenceConstants.*;
+
 public class ScheduleSetupActivity extends BaseScheduleActivity {
     private static final String TAG = "ScheduleSetupActivity";
-    private static final String PREFS_NAME = "FocusPrefs";
-    private static final String KEY_FOCUS_MODE = "focusEnabled";
     private static final String ONBOARDING_PREFS = "AvdhaanPrefs";
     private static final String KEY_FIRST_TIME = "isFirstTime";
 

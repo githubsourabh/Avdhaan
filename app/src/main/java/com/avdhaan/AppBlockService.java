@@ -11,55 +11,58 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.avdhaan.PreferenceConstants.*;
+
 public class AppBlockService extends AccessibilityService {
 
     private static final String TAG = "AppBlockService";
-    private static final String PREFS_NAME = "FocusPrefs";
     private static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
-    private static final String KEY_FOCUS_MODE = "focusEnabled";
-    private static final String KEY_BLOCKED_APPS = "blockedApps";
 
     private Set<String> blockedApps = new HashSet<>();
     private SharedPreferences prefs;
     private SharedPreferences blockedPrefs;
     private boolean isServiceConnected = false;
+    private SharedPreferences.OnSharedPreferenceChangeListener prefsListener;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        initializeService();
+    }
+
+    private void initializeService() {
+        prefs = getSharedPreferences(PREF_NAME, MODE_PRIVATE);
         blockedPrefs = getSharedPreferences(BLOCKED_PREFS_NAME, MODE_PRIVATE);
-        Log.d(TAG, "Service created");
+        
+        prefsListener = (sharedPreferences, key) -> {
+            if (KEY_BLOCKED_APPS.equals(key)) {
+                loadBlockedApps();
+            }
+        };
+        blockedPrefs.registerOnSharedPreferenceChangeListener(prefsListener);
+        
         loadBlockedApps();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        // Disable focus mode when service is destroyed
-        if (prefs != null) {
-            prefs.edit().putBoolean(KEY_FOCUS_MODE, false).apply();
-            Log.d(TAG, "Focus mode disabled in onDestroy");
+        if (blockedPrefs != null && prefsListener != null) {
+            blockedPrefs.unregisterOnSharedPreferenceChangeListener(prefsListener);
         }
         isServiceConnected = false;
-        Log.d(TAG, "Service destroyed");
     }
 
     private boolean isFocusModeOn() {
-        boolean isOn = prefs.getBoolean(KEY_FOCUS_MODE, false);
-        Log.d(TAG, "Focus mode is " + (isOn ? "ON" : "OFF"));
-        return isOn;
+        return prefs.getBoolean(KEY_FOCUS_MODE, false);
     }
 
     @Override
     public void onServiceConnected() {
         super.onServiceConnected();
         isServiceConnected = true;
-        loadBlockedApps();
-        Log.d(TAG, "Service connected. Blocked apps count: " + blockedApps.size());
-        Log.d(TAG, "Focus mode state: " + (isFocusModeOn() ? "ON" : "OFF"));
+        initializeService();
         
-        // Send broadcast to notify that service is connected
         Intent intent = new Intent("com.avdhaan.SERVICE_CONNECTED");
         sendBroadcast(intent);
     }
@@ -67,8 +70,6 @@ public class AppBlockService extends AccessibilityService {
     @Override
     public boolean onUnbind(Intent intent) {
         isServiceConnected = false;
-        // Don't disable focus mode on unbind, as the service might be temporarily unbound
-        Log.d(TAG, "Service unbound");
         return super.onUnbind(intent);
     }
 
@@ -91,11 +92,12 @@ public class AppBlockService extends AccessibilityService {
         }
 
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) {
+            Log.d(TAG, "Not a window state change event, skipping");
             return;
         }
         
         String packageName = String.valueOf(event.getPackageName());
-        Log.d(TAG, "Checking package: " + packageName);
+        Log.d(TAG, "Checking package: " + packageName + ", Blocked apps: " + blockedApps);
 
         // Skip if it's our own app
         if (packageName.equals(getPackageName())) {
@@ -158,6 +160,6 @@ public class AppBlockService extends AccessibilityService {
 
     @Override
     public void onInterrupt() {
-        Log.d(TAG, "Service interrupted");
+        // Implementation needed
     }
 }

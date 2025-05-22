@@ -19,10 +19,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.avdhaan.PreferenceConstants.*;
+
 public class OnboardingAppSelectionActivity extends AppCompatActivity {
     private static final String TAG = "OnboardingAppSelection";
-    private static final String PREFS_NAME = "BlockedPrefs";
-    private static final String BLOCKED_APPS_KEY = "blockedApps";
+    private static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
     
     protected RecyclerView recyclerView;
     protected AppAdapter appAdapter;
@@ -38,7 +39,7 @@ public class OnboardingAppSelectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_selection);
 
-        prefs = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        prefs = getSharedPreferences(BLOCKED_PREFS_NAME, Context.MODE_PRIVATE);
         loadBlockedAppsFromPrefs();
         setupViews();
     }
@@ -109,15 +110,19 @@ public class OnboardingAppSelectionActivity extends AppCompatActivity {
     }
 
     private void loadBlockedAppsFromPrefs() {
-        Set<String> savedSet = prefs.getStringSet(BLOCKED_APPS_KEY, new HashSet<>());
+        Set<String> savedSet = prefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
         blockedApps = new HashSet<>(savedSet != null ? savedSet : new HashSet<>());
     }
 
     protected void saveSelectedApps(List<String> selectedApps) {
-        // Save to the same SharedPreferences as SelectAppsActivity
+        // Save to the same SharedPreferences as AppBlockService
         prefs.edit()
-            .putStringSet(BLOCKED_APPS_KEY, new HashSet<>(selectedApps))
-            .apply();
+            .putStringSet(KEY_BLOCKED_APPS, new HashSet<>(selectedApps))
+            .commit(); // Use commit() instead of apply() for immediate write
         Log.d(TAG, "Saved selected apps: " + selectedApps);
+        
+        // Verify the save
+        Set<String> savedSet = prefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
+        Log.d(TAG, "Verified saved apps: " + savedSet);
     }
 }
