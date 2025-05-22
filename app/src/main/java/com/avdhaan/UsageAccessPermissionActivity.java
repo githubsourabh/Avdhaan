@@ -26,7 +26,7 @@ public class UsageAccessPermissionActivity extends AppCompatActivity {
         buttonDeclineAccess.setOnClickListener(v -> {
             // Set tracking as disabled when user declines
             new UsageTrackingPreferences(this).setTrackingEnabled(false);
-            startActivity(new Intent(this, UsageAccessDeclinedInfoActivity.class));
+            startActivity(new Intent(this, OnboardingAccessUsagePermDenied.class));
             finish();
         });
     }
