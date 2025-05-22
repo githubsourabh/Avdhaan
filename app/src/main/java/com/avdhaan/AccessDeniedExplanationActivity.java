@@ -6,7 +6,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.avdhaan.utils.OnboardingUtils;
+import com.avdhaan.OnboardingUtils;
 
 public class AccessDeniedExplanationActivity extends AppCompatActivity {
 

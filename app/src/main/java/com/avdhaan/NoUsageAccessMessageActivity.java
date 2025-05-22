@@ -6,7 +6,6 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.avdhaan.utils.OnboardingUtils;
 
 public class NoUsageAccessMessageActivity extends AppCompatActivity {
 

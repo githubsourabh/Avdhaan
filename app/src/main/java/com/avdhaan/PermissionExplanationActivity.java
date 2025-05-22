@@ -10,7 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.avdhaan.utils.OnboardingUtils;
+import com.avdhaan.OnboardingUtils;
 
 public class PermissionExplanationActivity extends AppCompatActivity {
 
