@@ -143,8 +143,11 @@
     <string name="accessibility_service_name">com.avdhaan/.AppBlockService</string>
 
     <string name="select_apps_message">Select the apps you want to block during focus mode</string>
-    <string name="button_select_all">Select All</string>
     <string name="button_deselect_all">Deselect All</string>
+    <string name="button_proceed_without_selection">Proceed without App Selection</string>
+    <string name="dialog_proceed_without_selection_title">Warning</string>
+    <string name="dialog_proceed_without_selection_message">You should select apps for which you want to limit usage. To go back close the window. To continue without selection press Continue.</string>
+    <string name="dialog_continue">Continue</string>
     <string name="start_time">Start Time</string>
     <string name="end_time">End Time</string>
     <string name="repeat_days">Repeat on</string>
