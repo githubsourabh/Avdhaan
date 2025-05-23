@@ -6,12 +6,16 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import java.util.List;
 
 import static com.avdhaan.PreferenceConstants.*;
 
 public class ScheduleSetupActivity extends BaseScheduleActivity {
     private static final String TAG = "ScheduleSetupActivity";
+    private RecyclerView scheduleList;
+    private ScheduleListAdapter adapter;
 
     @Override
     protected int getLayoutResourceId() {
@@ -23,6 +27,33 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: Initializing ScheduleSetupActivity");
         setupNextButton();
+        setupScheduleList();
+    }
+
+    private void setupScheduleList() {
+        scheduleList = findViewById(R.id.scheduleList);
+        scheduleList.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ScheduleListAdapter(this, ScheduleStorage.loadSchedules(this), new ScheduleListAdapter.OnScheduleUpdated() {
+            @Override
+            public void onEdit(int position) {
+                // Handle edit if needed
+            }
+
+            @Override
+            public void onDelete(int position) {
+                List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(ScheduleSetupActivity.this);
+                schedules.remove(position);
+                ScheduleStorage.saveSchedules(ScheduleSetupActivity.this, schedules);
+                adapter.updateSchedules(schedules);
+            }
+
+            @Override
+            public void onScheduleUpdated() {
+                List<FocusSchedule> updatedSchedules = ScheduleStorage.loadSchedules(ScheduleSetupActivity.this);
+                adapter.updateSchedules(updatedSchedules);
+            }
+        });
+        scheduleList.setAdapter(adapter);
     }
 
     private void setupNextButton() {
@@ -61,8 +92,11 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
         // Show success message
         Toast.makeText(this, "Schedule saved successfully", Toast.LENGTH_SHORT).show();
         
-        // Log the saved schedules
+        // Update the RecyclerView with new schedules
         List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+        adapter.updateSchedules(schedules);
+        
+        // Log the saved schedules
         Log.d(TAG, "Schedules after saving: " + schedules.size());
         for (FocusSchedule schedule : schedules) {
             Log.d(TAG, "Schedule: Day=" + schedule.dayOfWeek + 
