@@ -36,7 +36,7 @@ public class OnboardingAccessDeniedContinueForUsage extends AppCompatActivity {
             OnboardingUtils.updateUsageStatsState(this);
             // Set tracking as enabled when permission is granted
             new UsageTrackingPreferences(this).setTrackingEnabled(true);
-            startActivity(new Intent(this, AppSelectionOnboardingActivity.class));
+            startActivity(new Intent(this, OnboardingAccessDeniedUsageGranted.class));
             finish();
         }
     }

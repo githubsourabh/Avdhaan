@@ -54,6 +54,7 @@
         <activity android:name=".OnboardingAccessPermDenied" />
         <activity android:name=".OnboardingAccessDeniedContinueForUsage" />
         <activity android:name=".OnboardingAccessGrantedUsageDenied" />
+        <activity android:name=".OnboardingAccessDeniedUsageGranted" />
         
         <activity
             android:name=".BlockScreenActivity"
