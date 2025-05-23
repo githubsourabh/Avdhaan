@@ -45,18 +45,10 @@
         <activity android:name=".ScheduleListActivity" />
         <activity android:name=".ScheduleSetupActivity" />
         <activity android:name=".FinalOnboardingActivity" />
-        <activity android:name=".DEPRECATED_WelcomeActivity" />
         <activity android:name=".UsageAccessRequestActivity" />
         <activity android:name=".NotReadyActivity" />
         <activity android:name=".AppSelectionOnboardingActivity" />
-        <activity android:name=".DEPRECATED_AppSelectionIntroActivity" />
-        <activity android:name=".DEPRECATED_AppSelectionSuccessActivity" />
-        <activity android:name=".DEPRECATED_ScheduleSetupSuccessActivity" />
-        <activity android:name=".DEPRECATED_AccessGrantedActivity" />
         <activity android:name=".PermissionExplanationActivity" />
-        <activity android:name=".DEPRECATED_AccessNotGrantedInfoActivity" />
-        <activity android:name=".DEPRECATED_UsageAccessInfoActivity" />
-        <activity android:name=".DEPRECATED_AccessDeniedInfoActivity" />
         <activity android:name=".UsageAccessSettingsActivity" />
         <activity android:name=".OnboardingAccessUsagePermDenied" />
         <activity android:name=".OnboardingAccessPermDenied" />
@@ -74,12 +66,8 @@
         
         <activity android:name=".onboarding.WelcomeActivity" />
         <activity android:name=".UsageAccessDeclinedInfoActivity" />
-        <activity android:name=".DEPRECATED_PermissionIntroActivity" />
         <activity android:name=".ScheduleBlockingActivity" />
         <activity android:name=".UsageAccessPermissionActivity" />
-        <activity android:name=".DEPRECATED_AppBlockerSettingsActivity" />
-        <activity android:name=".DEPRECATED_NoUsageAccessMessageActivity" />
-        <activity android:name=".DEPRECATED_AccessDeniedExplanationActivity" />
         <activity android:name=".ScheduleActivity" />
         <activity android:name=".AppUsageListActivity" />
         <activity android:name=".OnboardingCongratulationsAfterSchedule" />
