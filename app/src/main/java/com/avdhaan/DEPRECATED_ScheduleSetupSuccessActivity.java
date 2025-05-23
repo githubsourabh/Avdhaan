@@ -7,7 +7,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class ScheduleSetupSuccessActivity extends AppCompatActivity {
+public class DEPRECATED_ScheduleSetupSuccessActivity extends AppCompatActivity {
 
     private Button buttonGoToMain;
 
@@ -21,7 +21,7 @@ public class ScheduleSetupSuccessActivity extends AppCompatActivity {
         buttonGoToMain.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(ScheduleSetupSuccessActivity.this, MainActivity.class);
+                Intent intent = new Intent(DEPRECATED_ScheduleSetupSuccessActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
             }

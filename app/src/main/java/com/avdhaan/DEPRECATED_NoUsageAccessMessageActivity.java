@@ -6,24 +6,24 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.avdhaan.OnboardingUtils;
 
-public class PermissionIntroActivity extends AppCompatActivity {
+public class DEPRECATED_NoUsageAccessMessageActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_permission_explanation);
+        setContentView(R.layout.activity_access_not_granted_info);
 
         Button buttonGrantAccess = findViewById(R.id.button_grant_access);
-        Button buttonSkipAccess = findViewById(R.id.button_skip_access);
+        Button buttonSkipAccess = findViewById(R.id.button_skip_usage_access);
 
         buttonGrantAccess.setOnClickListener(v -> {
-            startActivity(OnboardingUtils.getAccessibilitySettingsIntent());
+            startActivity(new Intent(this, UsageAccessPermissionActivity.class));
+            finish();
         });
 
         buttonSkipAccess.setOnClickListener(v -> {
-            startActivity(new Intent(this, UsageAccessInfoActivity.class));
+            startActivity(new Intent(this, MainActivity.class));
             finish();
         });
     }
@@ -31,8 +31,8 @@ public class PermissionIntroActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (OnboardingUtils.hasAccessibilityPermission(this, getString(R.string.accessibility_service_name))) {
-            startActivity(new Intent(this, AccessGrantedActivity.class));
+        if (OnboardingUtils.hasUsageStatsPermission(this)) {
+            startActivity(new Intent(this, AppSelectionOnboardingActivity.class));
             finish();
         }
     }

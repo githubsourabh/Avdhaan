@@ -7,32 +7,30 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class AccessNotGrantedInfoActivity extends AppCompatActivity {
+public class DEPRECATED_AccessDeniedInfoActivity extends AppCompatActivity {
 
-    private Button buttonGrantAccess;
-    private Button buttonSkipAccess;
+    private Button buttonGrantUsageAccess, buttonSkipUsageAccess;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_access_not_granted_info);
+        setContentView(R.layout.activity_access_denied_info);
 
-        buttonGrantAccess = findViewById(R.id.button_grant_access);
-        buttonSkipAccess = findViewById(R.id.button_skip_access);
+        buttonGrantUsageAccess = findViewById(R.id.button_grant_usage_access);
+        buttonSkipUsageAccess = findViewById(R.id.button_skip_usage_access);
 
-        buttonGrantAccess.setOnClickListener(new View.OnClickListener() {
+        buttonGrantUsageAccess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(android.provider.Settings.ACTION_USAGE_ACCESS_SETTINGS);
                 startActivity(intent);
-                // You may want to monitor access state and navigate accordingly later
             }
         });
 
-        buttonSkipAccess.setOnClickListener(new View.OnClickListener() {
+        buttonSkipUsageAccess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AccessNotGrantedInfoActivity.this, NoUsageAccessMessageActivity.class);
+                Intent intent = new Intent(DEPRECATED_AccessDeniedInfoActivity.this, FinalFallbackActivity.class);
                 startActivity(intent);
                 finish();
             }

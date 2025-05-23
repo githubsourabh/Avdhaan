@@ -7,7 +7,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class AccessGrantedActivity extends AppCompatActivity {
+public class DEPRECATED_AccessGrantedActivity extends AppCompatActivity {
 
     private Button buttonSelectApps;
 
@@ -20,7 +20,7 @@ public class AccessGrantedActivity extends AppCompatActivity {
         buttonSelectApps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AccessGrantedActivity.this, AppSelectionOnboardingActivity.class);
+                Intent intent = new Intent(DEPRECATED_AccessGrantedActivity.this, AppSelectionOnboardingActivity.class);
                 startActivity(intent);
                 finish();
             }

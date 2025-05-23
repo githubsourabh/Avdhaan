@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.avdhaan.OnboardingUtils;
 
-public class AccessDeniedExplanationActivity extends AppCompatActivity {
+public class DEPRECATED_AccessDeniedExplanationActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

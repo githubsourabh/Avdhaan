@@ -7,7 +7,7 @@ import android.widget.Button;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-public class AppSelectionIntroActivity extends AppCompatActivity {
+public class DEPRECATED_AppSelectionIntroActivity extends AppCompatActivity {
 
     private Button buttonSelectApps;
 
@@ -21,7 +21,7 @@ public class AppSelectionIntroActivity extends AppCompatActivity {
         buttonSelectApps.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(AppSelectionIntroActivity.this, AppBlockerSettingsActivity.class);
+                Intent intent = new Intent(DEPRECATED_AppSelectionIntroActivity.this, DEPRECATED_AppBlockerSettingsActivity.class);
                 startActivity(intent);
                 finish();
             }
