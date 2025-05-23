@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="I understand you need more time to grant Accessibility permissions to Avdhaan. Without Accessibility permissions you will not be able to restrict access to Apps that eat your Productive Time. When you are ready, you can easily grant this access from Avdhaan's homepage. For now we will continue to Usage Access permissions. With these permissions I will be able to provide you onging insights into which apps you spend your most time on. With these insights you can track and improve your productivity"
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/button_continue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Continue"/>
+
+</LinearLayout> 

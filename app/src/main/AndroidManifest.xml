@@ -62,6 +62,8 @@
         <activity android:name=".AccessDeniedInfoActivity" />
         <activity android:name=".UsageAccessSettingsActivity" />
         <activity android:name=".OnboardingAccessUsagePermDenied" />
+        <activity android:name=".OnboardingAccessPermDenied" />
+        <activity android:name=".OnboardingAccessDeniedContinueForUsage" />
         
         <activity
             android:name=".BlockScreenActivity"

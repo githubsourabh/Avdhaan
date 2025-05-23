@@ -36,7 +36,7 @@ public class PermissionExplanationActivity extends AppCompatActivity {
         });
 
         buttonSkipAccess.setOnClickListener(v -> {
-            startActivity(new Intent(this, UsageAccessPermissionActivity.class));
+            startActivity(new Intent(this, OnboardingAccessDeniedContinueForUsage.class));
             finish();
         });
     }
