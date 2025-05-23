@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="I understand you don't want to give 'Apps Usage' privilege to Avdhaan currently. This is needed to show you insights about your usage pattern of differnt Apps.  You can enable this privilege from the homescreen anytime. Good thing, you are good to proceed with utilizing core functionality of being able to restrict access to apps of your choice based on the schedule you decide."
+        android:textAlignment="center"
+        android:textSize="16sp"
+        android:layout_marginBottom="32dp"/>
+
+    <Button
+        android:id="@+id/button_continue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Continue"/>
+
+</LinearLayout> 
