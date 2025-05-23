@@ -70,11 +70,10 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
                 return;
             }
             
-            // Navigate to final activity
-            Log.d(TAG, "Preparing to navigate to FinalActivityBeforeMainActivity");
-            Intent intent = new Intent(this, FinalActivityBeforeMainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            Log.d(TAG, "Starting FinalActivityBeforeMainActivity");
+            // Navigate to congratulations activity
+            Log.d(TAG, "Preparing to navigate to OnboardingCongratulationsAfterSchedule");
+            Intent intent = new Intent(this, OnboardingCongratulationsAfterSchedule.class);
+            Log.d(TAG, "Starting OnboardingCongratulationsAfterSchedule");
             startActivity(intent);
             Log.d(TAG, "Finishing ScheduleSetupActivity");
             finish();

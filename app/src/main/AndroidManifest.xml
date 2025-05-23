@@ -85,6 +85,7 @@
         <activity android:name=".AccessDeniedExplanationActivity" />
         <activity android:name=".ScheduleActivity" />
         <activity android:name=".AppUsageListActivity" />
+        <activity android:name=".OnboardingCongratulationsAfterSchedule" />
 
         <!-- Accessibility service -->
         <service
