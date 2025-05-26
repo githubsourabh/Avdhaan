@@ -18,6 +18,9 @@ public interface FocusScheduleDao {
     @Query("SELECT * FROM focus_schedules WHERE groupId = :groupId")
     List<FocusSchedule> getSchedulesForGroup(int groupId);
 
+    @Query("SELECT * FROM focus_schedules")
+    List<FocusSchedule> getAllSchedules();
+
     @Query("DELETE FROM focus_schedules WHERE id = :scheduleId")
     void deleteScheduleById(int scheduleId);
 

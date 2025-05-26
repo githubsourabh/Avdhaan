@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import com.avdhaan.db.FocusSchedule;
 
 public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapter.ScheduleViewHolder> {
 
@@ -69,10 +70,10 @@ public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapte
     @Override
     public void onBindViewHolder(@NonNull ScheduleViewHolder holder, int position) {
         FocusSchedule schedule = schedules.get(position);
-        String day = getDayName(schedule.dayOfWeek);
-        String time = formatTime(schedule.startHour, schedule.startMinute) +
+        String day = getDayName(schedule.getDayOfWeek());
+        String time = formatTime(schedule.getStartHour(), schedule.getStartMinute()) +
                 " - " +
-                formatTime(schedule.endHour, schedule.endMinute);
+                formatTime(schedule.getEndHour(), schedule.getEndMinute());
         holder.scheduleText.setText(day + " " + time);
 
         holder.editButton.setOnClickListener(v -> callback.onEdit(position));

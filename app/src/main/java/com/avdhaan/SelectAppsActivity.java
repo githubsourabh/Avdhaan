@@ -1,17 +1,18 @@
 package com.avdhaan;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.avdhaan.db.AppDatabase;
+import com.avdhaan.db.BlockedApp;
+import com.avdhaan.db.BlockedAppDao;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -21,18 +22,16 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static com.avdhaan.PreferenceConstants.*;
-
 public class SelectAppsActivity extends AppCompatActivity {
 
     private static final String TAG = "SelectAppsActivity";
-    private ExecutorService executor;
+    private static final int DEFAULT_GROUP_ID = 1;
 
+    private ExecutorService executor;
     private RecyclerView recyclerView;
     private AppListAdapter adapter;
     private Set<String> blockedApps = new HashSet<>();
-    private SharedPreferences prefs;
-    private PackageManager packageManager;
+    private BlockedAppDao blockedAppDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,78 +39,58 @@ public class SelectAppsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_select_apps);
 
         executor = Executors.newSingleThreadExecutor();
+        blockedAppDao = AppDatabase.getInstance(this).blockedAppDao();
+
         recyclerView = findViewById(R.id.apps_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        
-        prefs = getSharedPreferences(BLOCKED_PREFS_NAME, Context.MODE_PRIVATE);
-        packageManager = getPackageManager();
 
-        loadBlockedAppsFromPrefs();
-        loadInstalledApps();
+        loadBlockedAppsAndPopulate();
     }
 
-    private void loadBlockedAppsFromPrefs() {
-        Set<String> savedSet = prefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
-        blockedApps = new HashSet<>(savedSet != null ? savedSet : new HashSet<>());
-    }
+    private void loadBlockedAppsAndPopulate() {
+        executor.execute(() -> {
+            List<BlockedApp> blockedAppList = blockedAppDao.getBlockedAppsByGroup(DEFAULT_GROUP_ID);
+            for (BlockedApp app : blockedAppList) {
+                blockedApps.add(app.getPackageName());
+            }
 
-    private void saveBlockedAppsToPrefs() {
-        prefs.edit()
-            .putStringSet(KEY_BLOCKED_APPS, new HashSet<>(blockedApps))
-            .commit();
-        Toast.makeText(this, R.string.blocked_apps_updated, Toast.LENGTH_SHORT).show();
-        
-        Set<String> savedSet = prefs.getStringSet(KEY_BLOCKED_APPS, new HashSet<>());
-        Log.d(TAG, "Verified saved apps: " + savedSet);
-    }
-
-    private void loadInstalledApps() {
-        if (executor != null && !executor.isShutdown()) {
-            executor.execute(() -> {
-                List<ApplicationInfo> installedApps = packageManager.getInstalledApplications(PackageManager.GET_META_DATA);
-                List<AppInfo> userApps = new ArrayList<>();
-                String currentPackage = getPackageName();
-
-                for (ApplicationInfo app : installedApps) {
-                    // Skip only our own app
-                    if (app.packageName.equals(currentPackage)) {
-                        continue;
-                    }
-                    // Show all launchable apps (system and user)
-                    if (packageManager.getLaunchIntentForPackage(app.packageName) != null) {
-                        String appName = packageManager.getApplicationLabel(app).toString();
-                        Drawable icon;
-                        try {
-                            icon = packageManager.getApplicationIcon(app);
-                        } catch (Exception e) {
-                            // If there's an error loading the icon, use a default icon
-                            icon = getResources().getDrawable(R.mipmap.ic_launcher, getTheme());
+            List<AppInfo> apps = getInstalledUserApps();
+            runOnUiThread(() -> {
+                adapter = new AppListAdapter(apps, blockedApps, (packageName, isChecked) -> {
+                    executor.execute(() -> {
+                        if (isChecked) {
+                            blockedAppDao.insertBlockedApp(new BlockedApp(packageName, DEFAULT_GROUP_ID));
+                        } else {
+                            blockedAppDao.deleteByPackageName(packageName);
                         }
-                        boolean isBlocked = blockedApps.contains(app.packageName);
-
-                        userApps.add(new AppInfo(appName, app.packageName, icon, isBlocked));
-                    }
-                }
-
-                Collections.sort(userApps, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-
-                runOnUiThread(() -> {
-                    adapter = new AppListAdapter(userApps, updatedBlockedApps -> {
-                        blockedApps = updatedBlockedApps;
-                        saveBlockedAppsToPrefs();
                     });
-                    recyclerView.setAdapter(adapter);
                 });
+                recyclerView.setAdapter(adapter);
             });
+        });
+    }
+
+    private List<AppInfo> getInstalledUserApps() {
+        List<AppInfo> appList = new ArrayList<>();
+        PackageManager pm = getPackageManager();
+        List<ApplicationInfo> installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
+
+        for (ApplicationInfo appInfo : installedApps) {
+            if (pm.getLaunchIntentForPackage(appInfo.packageName) != null &&
+                    (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+                Drawable icon = appInfo.loadIcon(pm);
+                String name = appInfo.loadLabel(pm).toString();
+                appList.add(new AppInfo(name, appInfo.packageName, icon));
+            }
         }
+
+        Collections.sort(appList, (a1, a2) -> a1.getAppName().compareToIgnoreCase(a2.getAppName()));
+        return appList;
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (executor != null) {
-            executor.shutdown();
-            executor = null;
-        }
+        executor.shutdownNow();
     }
 }

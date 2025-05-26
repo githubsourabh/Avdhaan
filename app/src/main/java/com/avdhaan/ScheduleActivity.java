@@ -1,14 +1,22 @@
 package com.avdhaan;
 
+import android.content.Intent;
 import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.avdhaan.db.AppDatabase;
+import com.avdhaan.db.FocusSchedule;
+
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class ScheduleActivity extends BaseScheduleActivity implements ScheduleListAdapter.OnScheduleUpdated {
 
     private RecyclerView scheduleList;
     private ScheduleListAdapter adapter;
+    private final ExecutorService executor = AppDatabase.databaseWriteExecutor;
 
     @Override
     protected int getLayoutResourceId() {
@@ -24,40 +32,51 @@ public class ScheduleActivity extends BaseScheduleActivity implements ScheduleLi
     private void setupScheduleList() {
         scheduleList = findViewById(R.id.scheduleList);
         scheduleList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ScheduleListAdapter(this, ScheduleStorage.loadSchedules(this), this);
-        scheduleList.setAdapter(adapter);
+        executor.execute(() -> {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            runOnUiThread(() -> {
+                adapter = new ScheduleListAdapter(this, schedules, this);
+                scheduleList.setAdapter(adapter);
+            });
+        });
     }
 
     @Override
     protected void onScheduleSaved() {
-        List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-        adapter.updateSchedules(schedules);
+        executor.execute(() -> {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            runOnUiThread(() -> adapter.updateSchedules(schedules));
+        });
     }
 
     @Override
     public void onEdit(int position) {
-        // Handle edit
-        List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-        if (position >= 0 && position < schedules.size()) {
-            FocusSchedule schedule = schedules.get(position);
-            // TODO: Implement edit functionality
-        }
+        executor.execute(() -> {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            if (position >= 0 && position < schedules.size()) {
+                FocusSchedule schedule = schedules.get(position);
+                // TODO: Implement edit functionality
+            }
+        });
     }
 
     @Override
     public void onDelete(int position) {
-        // Handle delete
-        List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-        if (position >= 0 && position < schedules.size()) {
-            schedules.remove(position);
-            ScheduleStorage.saveSchedules(this, schedules);
-            adapter.updateSchedules(schedules);
-        }
+        executor.execute(() -> {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            if (position >= 0 && position < schedules.size()) {
+                schedules.remove(position);
+                ScheduleStorage.saveSchedules(this, schedules);
+                runOnUiThread(() -> adapter.updateSchedules(schedules));
+            }
+        });
     }
 
     @Override
     public void onScheduleUpdated() {
-        List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-        adapter.updateSchedules(schedules);
+        executor.execute(() -> {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            runOnUiThread(() -> adapter.updateSchedules(schedules));
+        });
     }
-} 
+}

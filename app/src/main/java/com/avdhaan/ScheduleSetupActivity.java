@@ -1,21 +1,25 @@
 package com.avdhaan;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.Toast;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import java.util.List;
 
-import static com.avdhaan.PreferenceConstants.*;
+import com.avdhaan.db.AppDatabase;
+import com.avdhaan.db.FocusSchedule;
+
+import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 public class ScheduleSetupActivity extends BaseScheduleActivity {
     private static final String TAG = "ScheduleSetupActivity";
     private RecyclerView scheduleList;
     private ScheduleListAdapter adapter;
+    private ExecutorService executor;
 
     @Override
     protected int getLayoutResourceId() {
@@ -26,6 +30,7 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "onCreate: Initializing ScheduleSetupActivity");
+        executor = AppDatabase.databaseWriteExecutor;
         setupNextButton();
         setupScheduleList();
     }
@@ -33,75 +38,81 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
     private void setupScheduleList() {
         scheduleList = findViewById(R.id.scheduleList);
         scheduleList.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ScheduleListAdapter(this, ScheduleStorage.loadSchedules(this), new ScheduleListAdapter.OnScheduleUpdated() {
-            @Override
-            public void onEdit(int position) {
-                // Handle edit if needed
-            }
 
-            @Override
-            public void onDelete(int position) {
-                List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(ScheduleSetupActivity.this);
-                schedules.remove(position);
-                ScheduleStorage.saveSchedules(ScheduleSetupActivity.this, schedules);
-                adapter.updateSchedules(schedules);
-            }
+        executor.execute(() -> {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            runOnUiThread(() -> {
+                adapter = new ScheduleListAdapter(this, schedules, new ScheduleListAdapter.OnScheduleUpdated() {
+                    @Override
+                    public void onEdit(int position) {
+                        // Handle edit if needed
+                    }
 
-            @Override
-            public void onScheduleUpdated() {
-                List<FocusSchedule> updatedSchedules = ScheduleStorage.loadSchedules(ScheduleSetupActivity.this);
-                adapter.updateSchedules(updatedSchedules);
-            }
+                    @Override
+                    public void onDelete(int position) {
+                        executor.execute(() -> {
+                            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(ScheduleSetupActivity.this);
+                            schedules.remove(position);
+                            ScheduleStorage.saveSchedules(ScheduleSetupActivity.this, schedules);
+                            runOnUiThread(() -> adapter.updateSchedules(schedules));
+                        });
+                    }
+
+                    @Override
+                    public void onScheduleUpdated() {
+                        executor.execute(() -> {
+                            List<FocusSchedule> updatedSchedules = ScheduleStorage.loadSchedules(ScheduleSetupActivity.this);
+                            runOnUiThread(() -> adapter.updateSchedules(updatedSchedules));
+                        });
+                    }
+                });
+                scheduleList.setAdapter(adapter);
+            });
         });
-        scheduleList.setAdapter(adapter);
     }
 
     private void setupNextButton() {
         Button nextButton = findViewById(R.id.nextButton);
         nextButton.setOnClickListener(v -> {
             Log.d(TAG, "Next button clicked");
-            // Check if any schedule is saved
-            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-            Log.d(TAG, "Checking saved schedules: " + schedules.size());
-            
-            if (schedules.isEmpty()) {
-                Log.d(TAG, "No schedules found, showing toast");
-                Toast.makeText(this, "Please save at least one schedule", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            
-            // Navigate to congratulations activity
-            Log.d(TAG, "Preparing to navigate to OnboardingCongratulationsAfterSchedule");
-            Intent intent = new Intent(this, OnboardingCongratulationsAfterSchedule.class);
-            Log.d(TAG, "Starting OnboardingCongratulationsAfterSchedule");
-            startActivity(intent);
-            Log.d(TAG, "Finishing ScheduleSetupActivity");
-            finish();
+            executor.execute(() -> {
+                List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+                Log.d(TAG, "Checking saved schedules: " + schedules.size());
+
+                runOnUiThread(() -> {
+                    if (schedules.isEmpty()) {
+                        Log.d(TAG, "No schedules found, showing toast");
+                        Toast.makeText(this, "Please save at least one schedule", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d(TAG, "Navigating to OnboardingCongratulationsAfterSchedule");
+                        Intent intent = new Intent(this, OnboardingCongratulationsAfterSchedule.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                });
+            });
         });
     }
 
     @Override
     protected void onScheduleSaved() {
         Log.d(TAG, "onScheduleSaved called");
-        // Enable next button after schedule is saved
         Button nextButton = findViewById(R.id.nextButton);
         nextButton.setEnabled(true);
-        Log.d(TAG, "Next button enabled");
-        
-        // Show success message
         Toast.makeText(this, "Schedule saved successfully", Toast.LENGTH_SHORT).show();
-        
-        // Update the RecyclerView with new schedules
-        List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-        adapter.updateSchedules(schedules);
-        
-        // Log the saved schedules
-        Log.d(TAG, "Schedules after saving: " + schedules.size());
-        for (FocusSchedule schedule : schedules) {
-            Log.d(TAG, "Schedule: Day=" + schedule.dayOfWeek + 
-                      ", Start=" + schedule.startHour + ":" + schedule.startMinute +
-                      ", End=" + schedule.endHour + ":" + schedule.endMinute);
-        }
+
+        executor.execute(() -> {
+            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+            runOnUiThread(() -> {
+                adapter.updateSchedules(schedules);
+                Log.d(TAG, "Schedules after saving: " + schedules.size());
+                for (FocusSchedule schedule : schedules) {
+                    Log.d(TAG, "Schedule: Day=" + schedule.getDayOfWeek() +
+                            ", Start=" + schedule.getStartHour() + ":" + schedule.getStartMinute() +
+                            ", End=" + schedule.getEndHour() + ":" + schedule.getEndMinute());
+                }
+            });
+        });
     }
 
     @Override

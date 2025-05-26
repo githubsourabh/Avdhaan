@@ -1,5 +1,6 @@
 package com.avdhaan;
 
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,74 +11,65 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHolder> {
 
-    private final List<AppInfo> appList;
-    private final Set<String> blockedPackages = new HashSet<>();
-    private final Consumer<Set<String>> onBlockedChanged;
-
-    public AppListAdapter(List<AppInfo> apps, Consumer<Set<String>> onBlockedChanged) {
-        this.appList = apps;
-        this.onBlockedChanged = onBlockedChanged;
-
-        // Preload initially blocked apps
-        for (AppInfo app : apps) {
-            if (app.isBlocked()) {
-                blockedPackages.add(app.getPackageName());
-            }
-        }
+    public interface OnAppToggleListener {
+        void onAppToggled(String packageName, boolean isChecked);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView icon;
-        TextView name;
-        CheckBox checkBox;
+    private final List<AppInfo> appList;
+    private final Set<String> initiallyBlockedApps;
+    private final OnAppToggleListener toggleListener;
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            icon = itemView.findViewById(R.id.app_icon);
-            name = itemView.findViewById(R.id.app_name);
-            checkBox = itemView.findViewById(R.id.app_checkbox);
-        }
+    public AppListAdapter(List<AppInfo> appList, Set<String> blockedApps, OnAppToggleListener listener) {
+        this.appList = appList;
+        this.initiallyBlockedApps = blockedApps;
+        this.toggleListener = listener;
     }
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public AppListAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_app_row, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        AppInfo app = appList.get(position);
+    public void onBindViewHolder(@NonNull AppListAdapter.ViewHolder holder, int position) {
+        AppInfo appInfo = appList.get(position);
+        holder.appNameText.setText(appInfo.getAppName());
+        holder.packageNameText.setText(appInfo.getPackageName());
+        holder.appIcon.setImageDrawable(appInfo.getIcon());
 
-        holder.icon.setImageDrawable(app.getIcon());
-        holder.name.setText(app.getName());
+        boolean isInitiallyChecked = initiallyBlockedApps.contains(appInfo.getPackageName());
+        holder.blockCheckBox.setChecked(isInitiallyChecked);
 
-        // Avoid recycling issues
-        holder.checkBox.setOnCheckedChangeListener(null);
-        holder.checkBox.setChecked(blockedPackages.contains(app.getPackageName()));
-
-        holder.checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
-            app.setBlocked(isChecked);
-            if (isChecked) {
-                blockedPackages.add(app.getPackageName());
-            } else {
-                blockedPackages.remove(app.getPackageName());
-            }
-            onBlockedChanged.accept(new HashSet<>(blockedPackages));
+        holder.blockCheckBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            toggleListener.onAppToggled(appInfo.getPackageName(), isChecked);
         });
     }
 
     @Override
     public int getItemCount() {
         return appList.size();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        ImageView appIcon;
+        TextView appNameText;
+        TextView packageNameText;
+        CheckBox blockCheckBox;
+
+        public ViewHolder(View view) {
+            super(view);
+            appIcon = view.findViewById(R.id.app_icon);
+            appNameText = view.findViewById(R.id.app_name);
+            packageNameText = view.findViewById(R.id.textViewAppName);
+            blockCheckBox = view.findViewById(R.id.checkbox_app);
+        }
     }
 }

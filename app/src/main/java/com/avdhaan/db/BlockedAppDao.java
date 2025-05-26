@@ -26,4 +26,7 @@ public interface BlockedAppDao {
 
     @Query("DELETE FROM blocked_apps")
     void deleteAll();
+
+    @Query("SELECT EXISTS(SELECT 1 FROM blocked_apps WHERE packageName = :packageName)")
+    boolean isBlocked(String packageName);
 }
