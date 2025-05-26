@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -47,26 +48,66 @@ public class SelectAppsActivity extends AppCompatActivity {
     }
 
     private void loadBlockedAppsAndPopulate() {
-        executor.execute(() -> {
-            List<BlockedApp> blockedAppList = blockedAppDao.getBlockedAppsByGroup(DEFAULT_GROUP_ID);
-            for (BlockedApp app : blockedAppList) {
-                blockedApps.add(app.getPackageName());
-            }
+        try {
+            executor.execute(() -> {
+                try {
+                    List<BlockedApp> blockedAppList = blockedAppDao.getBlockedAppsByGroup(DEFAULT_GROUP_ID);
+                    for (BlockedApp app : blockedAppList) {
+                        blockedApps.add(app.getPackageName());
+                    }
 
-            List<AppInfo> apps = getInstalledUserApps();
-            runOnUiThread(() -> {
-                adapter = new AppListAdapter(apps, blockedApps, (packageName, isChecked) -> {
-                    executor.execute(() -> {
-                        if (isChecked) {
-                            blockedAppDao.insertBlockedApp(new BlockedApp(packageName, DEFAULT_GROUP_ID));
-                        } else {
-                            blockedAppDao.deleteByPackageName(packageName);
-                        }
+                    List<AppInfo> apps = getInstalledUserApps();
+                    runOnUiThread(() -> {
+                        adapter = new AppListAdapter(apps, blockedApps, (packageName, isChecked) -> {
+                            try {
+                                executor.execute(() -> {
+                                    try {
+                                        if (isChecked) {
+                                            blockedAppDao.insertBlockedApp(new BlockedApp(packageName, DEFAULT_GROUP_ID));
+                                        } else {
+                                            blockedAppDao.deleteByPackageName(packageName);
+                                        }
+                                    } catch (Exception e) {
+                                        Log.e(TAG, "Failed to update blocked app: " + packageName, e);
+                                        runOnUiThread(() -> {
+                                            Toast.makeText(SelectAppsActivity.this, 
+                                                "Failed to update app settings. Please try again.", 
+                                                Toast.LENGTH_SHORT).show();
+                                        });
+                                    }
+                                });
+                            } catch (Exception e) {
+                                Log.e(TAG, "Failed to execute database operation", e);
+                                runOnUiThread(() -> {
+                                    Toast.makeText(SelectAppsActivity.this, 
+                                        "System is busy. Please try again.", 
+                                        Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        });
+                        recyclerView.setAdapter(adapter);
                     });
-                });
-                recyclerView.setAdapter(adapter);
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to load blocked apps", e);
+                    runOnUiThread(() -> {
+                        Toast.makeText(SelectAppsActivity.this, 
+                            "Failed to load app settings. Please restart the app.", 
+                            Toast.LENGTH_SHORT).show();
+                        // Show empty list if loading fails
+                        adapter = new AppListAdapter(new ArrayList<>(), new HashSet<>(), (packageName, isChecked) -> {});
+                        recyclerView.setAdapter(adapter);
+                    });
+                }
             });
-        });
+        } catch (Exception e) {
+            Log.e(TAG, "Failed to execute initial load", e);
+            Toast.makeText(this, 
+                "System is busy. Please restart the app.", 
+                Toast.LENGTH_SHORT).show();
+            // Show empty list if loading fails
+            adapter = new AppListAdapter(new ArrayList<>(), new HashSet<>(), (packageName, isChecked) -> {});
+            recyclerView.setAdapter(adapter);
+        }
     }
 
     private List<AppInfo> getInstalledUserApps() {
