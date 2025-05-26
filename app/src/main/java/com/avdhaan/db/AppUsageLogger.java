@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
+import android.app.AppOpsManager;
+import com.avdhaan.UsageTrackingPreferences;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -130,42 +132,16 @@ public class AppUsageLogger {
     }
 
     private boolean shouldTrackApp(String packageName) {
-        Boolean cached = appCache.get(packageName);
-        if (cached != null) return cached;
+        // Check both system permission and user's tracking preference
+        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
+        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
+                android.os.Process.myUid(), context.getPackageName());
+        boolean hasPermission = mode == AppOpsManager.MODE_ALLOWED;
         
-        try {
-            ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
-            
-            // Track the app if any of these conditions are true:
-            // 1. It's not a system app
-            // 2. It's a system app but has been updated (user version installed)
-            // 3. It has a launcher activity (user can open it)
-            // 4. It's categorized as a game
-            boolean shouldTrack = true;
-            
-            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
-                boolean isUpdatedSystemApp = (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
-                boolean hasLauncherActivity = packageManager.getLaunchIntentForPackage(packageName) != null;
-                boolean isGame = (appInfo.category == ApplicationInfo.CATEGORY_GAME);
-                
-                // Only filter out system apps that are:
-                // - Not updated by user
-                // - Not launchable
-                // - Not games
-                shouldTrack = isUpdatedSystemApp || hasLauncherActivity || isGame;
-            }
-            
-            appCache.put(packageName, shouldTrack);
-            if (!shouldTrack) {
-                systemApps.add(packageName);
-            }
-            return shouldTrack;
-            
-        } catch (PackageManager.NameNotFoundException e) {
-            // If we can't find the package, assume we should track it
-            appCache.put(packageName, true);
-            return true;
-        }
+        UsageTrackingPreferences preferences = new UsageTrackingPreferences(context);
+        boolean isTrackingEnabled = preferences.isTrackingEnabled();
+        
+        return hasPermission && isTrackingEnabled;
     }
 
     public void shutdown() {

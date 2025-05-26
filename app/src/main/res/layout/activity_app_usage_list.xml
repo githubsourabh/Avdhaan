@@ -1,9 +1,7 @@
-
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/activity_app_usage_list"
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="12dp">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -12,4 +10,14 @@
         android:layout_height="match_parent"
         android:clipToPadding="false"
         android:scrollbars="vertical"/>
-</LinearLayout>
+
+    <TextView
+        android:id="@+id/emptyView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No usage logs found"
+        android:textSize="16sp"
+        android:visibility="gone"/>
+
+</FrameLayout>

@@ -82,10 +82,14 @@ public class MainActivity extends AppCompatActivity {
             prefs.edit().putBoolean(KEY_FIRST_TIME, false).apply();
         }
 
-        // Ensure logging is scheduled
+        // Ensure logging is scheduled and perform initial log
         UsageLoggingScheduler.schedule(getApplicationContext());
-
         appUsageLogger = new AppUsageLogger(getApplicationContext());
+        if (permissionManager.hasUsageStatsPermission()) {
+            executor.execute(() -> {
+                appUsageLogger.logUsage();
+            });
+        }
     }
 
     private void setupPermissionObserver() {
@@ -247,17 +251,12 @@ public class MainActivity extends AppCompatActivity {
         if (!isAccessibilityOn && isFocusOn) {
             focusSwitch.setChecked(false);
             saveFocusModeState(false);
-            //Toast.makeText(this, R.string.MAKE_FOCUS_MODE_OFF_WHEN_ACC_SVC_DISABLED_MSG, Toast.LENGTH_SHORT).show();
-            // Enhancement: Show warning popup if focus mode was ON but accessibility is OFF
-
-                new AlertDialog.Builder(this)
-                        .setTitle(getString(R.string.focus_mode_disabled_title))
-                        .setMessage(getString(R.string.focus_mode_disabled_message))
-                        .setPositiveButton(getString(R.string.ok), null)
-                        .setCancelable(false)
-                        .show();
-
-
+            new AlertDialog.Builder(this)
+                    .setTitle(getString(R.string.focus_mode_disabled_title))
+                    .setMessage(getString(R.string.focus_mode_disabled_message))
+                    .setPositiveButton(getString(R.string.ok), null)
+                    .setCancelable(false)
+                    .show();
         } else {
             focusSwitch.setChecked(isFocusOn);
         }
@@ -265,24 +264,7 @@ public class MainActivity extends AppCompatActivity {
         // Only log usage if permission is granted and logger is initialized
         if (appUsageLogger != null) {
             executor.execute(() -> {
-                if (trackingPreferences.isTrackingEnabled() && !permissionManager.hasUsageStatsPermission()) {
-                    // Show dialog instead of forcefully redirecting
-                    runOnUiThread(() -> {
-                        new androidx.appcompat.app.AlertDialog.Builder(this)
-                            .setTitle(R.string.usage_access_required_title)
-                            .setMessage(R.string.usage_access_required_message)
-                            .setPositiveButton(R.string.open_settings, (dialog, which) -> {
-                                Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-                                startActivity(intent);
-                            })
-                            .setNegativeButton(R.string.disable_tracking, (dialog, which) -> {
-                                trackingPreferences.setTrackingEnabled(false);
-                                usageTrackingSwitch.setChecked(false);
-                            })
-                            .setCancelable(false)
-                            .show();
-                    });
-                } else if (permissionManager.hasUsageStatsPermission()) {
+                if (permissionManager.hasUsageStatsPermission()) {
                     appUsageLogger.logUsage();
                 }
             });
