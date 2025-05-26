@@ -42,7 +42,6 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
     public void onBindViewHolder(@NonNull AppListAdapter.ViewHolder holder, int position) {
         AppInfo appInfo = appList.get(position);
         holder.appNameText.setText(appInfo.getAppName());
-        holder.packageNameText.setText(appInfo.getPackageName());
         holder.appIcon.setImageDrawable(appInfo.getIcon());
 
         boolean isInitiallyChecked = initiallyBlockedApps.contains(appInfo.getPackageName());
@@ -68,8 +67,7 @@ public class AppListAdapter extends RecyclerView.Adapter<AppListAdapter.ViewHold
             super(view);
             appIcon = view.findViewById(R.id.app_icon);
             appNameText = view.findViewById(R.id.app_name);
-            packageNameText = view.findViewById(R.id.textViewAppName);
-            blockCheckBox = view.findViewById(R.id.checkbox_app);
+            blockCheckBox = view.findViewById(R.id.app_checkbox);
         }
     }
 }

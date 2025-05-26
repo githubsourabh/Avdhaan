@@ -6,15 +6,14 @@ public class PreferenceConstants {
     public static final String KEY_FIRST_TIME = "isFirstTime";
     public static final String KEY_FOCUS_MODE = "focusEnabled";
 
-
-    // Deprecated: previously used for blocked apps and schedules via SharedPreferences
-
+    /*
+    // DEPRECATED: No longer used. Blocked apps are now stored in Room database
     @Deprecated
     public static final String BLOCKED_PREFS_NAME = "BlockedPrefs";
     @Deprecated
     public static final String KEY_BLOCKED_APPS = "blockedApps";
 
-    /*
+
     @Deprecated
     public static final String KEY_FOCUS_SCHEDULES = "focusSchedules";
     */

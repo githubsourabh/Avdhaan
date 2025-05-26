@@ -19,9 +19,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 
 public abstract class BaseScheduleActivity extends AppCompatActivity {
 
+    private static final String TAG = "BaseScheduleActivity";
     protected static final Map<Integer, Integer> DAY_ID_MAP = new HashMap<>();
     static {
         DAY_ID_MAP.put(R.id.toggleSun, Calendar.SUNDAY);
@@ -103,7 +105,7 @@ public abstract class BaseScheduleActivity extends AppCompatActivity {
     }
 
     protected void saveSchedule() {
-        Log.d("BaseScheduleActivity", "saveSchedule called");
+        Log.d(TAG, "saveSchedule called");
         startTimePicker.clearFocus();
         endTimePicker.clearFocus();
 
@@ -112,68 +114,90 @@ public abstract class BaseScheduleActivity extends AppCompatActivity {
         int endHour = getHour(endTimePicker);
         int endMinute = getMinute(endTimePicker);
 
-        Log.d("BaseScheduleActivity", "Time selected - Start: " + startHour + ":" + startMinute + 
+        Log.d(TAG, "Time selected - Start: " + startHour + ":" + startMinute + 
               ", End: " + endHour + ":" + endMinute);
 
         if (!isValidTimeRange(startHour, startMinute, endHour, endMinute)) {
-            Log.d("BaseScheduleActivity", "Invalid time range");
+            Log.d(TAG, "Invalid time range");
             Toast.makeText(this, getString(R.string.end_time_must_be_after_start), Toast.LENGTH_LONG).show();
             return;
         }
 
-        boolean anyDaySelected = false;
-        List<Integer> selectedDays = new ArrayList<>();
-        
-        for (int i = 0; i < dayToggleGrid.getChildCount(); i++) {
-            android.widget.ToggleButton toggle = (android.widget.ToggleButton) dayToggleGrid.getChildAt(i);
-            if (toggle.isChecked()) {
-                anyDaySelected = true;
-                selectedDays.add(getDayOfWeekFromId(toggle.getId()));
-            }
-        }
-
-        if (!anyDaySelected) {
-            Log.d("BaseScheduleActivity", "No days selected");
+        List<Integer> selectedDays = getSelectedDays();
+        if (selectedDays.isEmpty()) {
+            Log.d(TAG, "No days selected");
             Toast.makeText(this, getString(R.string.select_at_least_one_day), Toast.LENGTH_LONG).show();
             return;
         }
 
-        // Move database operations to background thread
-        executor.execute(() -> {
-            List<FocusSchedule> allSchedules = new ArrayList<>(ScheduleStorage.loadSchedules(this));
-            Log.d("BaseScheduleActivity", "Current schedules count: " + allSchedules.size());
+        try {
+            executor.execute(() -> {
+                try {
+                    // Get current schedules
+                    List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
+                    
+                    // Check for overlaps
+                    boolean hasOverlap = false;
+                    for (int dayOfWeek : selectedDays) {
+                        if (hasOverlappingSchedule(schedules, dayOfWeek, startHour, startMinute, endHour, endMinute)) {
+                            hasOverlap = true;
+                            break;
+                        }
+                    }
 
-            boolean hasOverlap = false;
-            for (int dayOfWeek : selectedDays) {
-                if (hasOverlappingSchedule(allSchedules, dayOfWeek, startHour, startMinute, endHour, endMinute)) {
-                    hasOverlap = true;
-                    break;
+                    if (hasOverlap) {
+                        runOnUiThread(() -> {
+                            Log.d(TAG, "Schedule overlaps with existing one");
+                            Toast.makeText(this, getString(R.string.schedule_overlaps_with_an_existing_one), Toast.LENGTH_LONG).show();
+                        });
+                        return;
+                    }
+
+                    // Create new schedule
+                    FocusSchedule schedule = new FocusSchedule();
+                    schedule.setDayOfWeek(selectedDays.get(0)); // Use first selected day
+                    schedule.setStartHour(startHour);
+                    schedule.setStartMinute(startMinute);
+                    schedule.setEndHour(endHour);
+                    schedule.setEndMinute(endMinute);
+                    schedule.setGroupId(1); // Default group
+
+                    // Update or add schedule
+                    if (editingScheduleIndex >= 0) {
+                        schedules.set(editingScheduleIndex, schedule);
+                    } else {
+                        schedules.add(schedule);
+                    }
+
+                    // Save to database
+                    ScheduleStorage.saveSchedules(this, schedules);
+
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Schedule saved successfully", Toast.LENGTH_SHORT).show();
+                        onScheduleSaved();
+                    });
+                } catch (Exception e) {
+                    Log.e(TAG, "Error saving schedule", e);
+                    runOnUiThread(() -> {
+                        Toast.makeText(this, "Error saving schedule. Please try again.", Toast.LENGTH_SHORT).show();
+                    });
                 }
-            }
-
-            if (hasOverlap) {
-                runOnUiThread(() -> {
-                    Log.d("BaseScheduleActivity", "Schedule overlaps with existing one");
-                    Toast.makeText(this, getString(R.string.schedule_overlaps_with_an_existing_one), Toast.LENGTH_LONG).show();
-                });
-                return;
-            }
-
-            // Add new schedules
-            for (int dayOfWeek : selectedDays) {
-                FocusSchedule newSchedule = new FocusSchedule(dayOfWeek, startHour, startMinute, endHour, endMinute);
-                allSchedules.add(newSchedule);
-                Log.d("BaseScheduleActivity", "Added new schedule for day: " + dayOfWeek);
-            }
-
-            Log.d("BaseScheduleActivity", "Saving " + allSchedules.size() + " schedules");
-            ScheduleStorage.saveSchedules(this, allSchedules);
-            
-            runOnUiThread(() -> {
-                Toast.makeText(this, getString(R.string.schedule_saved), Toast.LENGTH_SHORT).show();
-                onScheduleSaved();
             });
-        });
+        } catch (RejectedExecutionException e) {
+            Log.e(TAG, "Executor rejected task", e);
+            Toast.makeText(this, "Error saving schedule. Please try again.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    protected List<Integer> getSelectedDays() {
+        List<Integer> selectedDays = new ArrayList<>();
+        for (int i = 0; i < dayToggleGrid.getChildCount(); i++) {
+            android.widget.ToggleButton toggle = (android.widget.ToggleButton) dayToggleGrid.getChildAt(i);
+            if (toggle.isChecked()) {
+                selectedDays.add(getDayOfWeekFromId(toggle.getId()));
+            }
+        }
+        return selectedDays;
     }
 
     protected boolean isValidTimeRange(int startHour, int startMinute, int endHour, int endMinute) {
@@ -219,4 +243,10 @@ public abstract class BaseScheduleActivity extends AppCompatActivity {
     }
 
     protected abstract void onScheduleSaved();
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Don't shutdown the executor as it's shared across the app
+    }
 }

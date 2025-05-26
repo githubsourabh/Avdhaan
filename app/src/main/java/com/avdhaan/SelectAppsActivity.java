@@ -27,7 +27,7 @@ public class SelectAppsActivity extends AppCompatActivity {
     private static final String TAG = "SelectAppsActivity";
     private static final int DEFAULT_GROUP_ID = 1;
 
-    private ExecutorService executor;
+    private final ExecutorService executor = AppDatabase.databaseWriteExecutor;
     private RecyclerView recyclerView;
     private AppListAdapter adapter;
     private Set<String> blockedApps = new HashSet<>();
@@ -38,7 +38,6 @@ public class SelectAppsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_select_apps);
 
-        executor = Executors.newSingleThreadExecutor();
         blockedAppDao = AppDatabase.getInstance(this).blockedAppDao();
 
         recyclerView = findViewById(R.id.apps_recycler);
@@ -76,8 +75,12 @@ public class SelectAppsActivity extends AppCompatActivity {
         List<ApplicationInfo> installedApps = pm.getInstalledApplications(PackageManager.GET_META_DATA);
 
         for (ApplicationInfo appInfo : installedApps) {
-            if (pm.getLaunchIntentForPackage(appInfo.packageName) != null &&
-                    (appInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0) {
+            // Skip our own app
+            if (appInfo.packageName.equals(getPackageName())) {
+                continue;
+            }
+            // Show all launchable apps (system and user)
+            if (pm.getLaunchIntentForPackage(appInfo.packageName) != null) {
                 Drawable icon = appInfo.loadIcon(pm);
                 String name = appInfo.loadLabel(pm).toString();
                 appList.add(new AppInfo(name, appInfo.packageName, icon));
@@ -91,6 +94,6 @@ public class SelectAppsActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        executor.shutdownNow();
+        // Don't shutdown the executor as it's shared across the app
     }
 }

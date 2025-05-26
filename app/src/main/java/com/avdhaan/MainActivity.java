@@ -21,6 +21,7 @@ import androidx.appcompat.app.AlertDialog;
 
 import com.avdhaan.db.AppUsageLogger;
 import com.avdhaan.worker.UsageLoggingScheduler;
+import com.avdhaan.db.AppDatabase;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -32,7 +33,7 @@ import static com.avdhaan.PreferenceConstants.*;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
-    private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final ExecutorService executor = AppDatabase.databaseWriteExecutor;
     private AppUsageLogger appUsageLogger;
 
     private Switch focusSwitch;
@@ -297,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         if (appUsageLogger != null) {
             appUsageLogger.shutdown();
         }
-        executor.shutdownNow();
+        // Don't shutdown the executor as it's shared across the app
     }
 
     private boolean isAccessibilityEnabled() {

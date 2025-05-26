@@ -13,19 +13,17 @@ import com.avdhaan.db.AppUsage;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class AppUsageListActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
-    private ExecutorService executor;
+    private final ExecutorService executor = AppDatabase.databaseWriteExecutor;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_usage_list);
 
-        executor = Executors.newSingleThreadExecutor();
         recyclerView = findViewById(R.id.recyclerViewAppUsage);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -46,8 +44,6 @@ public class AppUsageListActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (executor != null) {
-            executor.shutdownNow();
-        }
+        // Don't shutdown the executor as it's shared across the app
     }
 }

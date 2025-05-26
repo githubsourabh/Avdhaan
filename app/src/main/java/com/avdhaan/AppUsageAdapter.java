@@ -16,18 +16,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.avdhaan.db.AppUsage;
+import com.avdhaan.db.AppDatabase;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHolder> {
 
     private static final String TAG = "AppUsageAdapter";
-    private static final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService executor = AppDatabase.databaseWriteExecutor;
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
 
     private final Context context;
@@ -110,6 +110,6 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
     }
 
     public void onDestroy() {
-        executor.shutdown();
+        // Don't shutdown the executor as it's shared across the app
     }
 }
