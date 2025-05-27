@@ -1,6 +1,7 @@
 package com.avdhaan.db;
 
 import android.content.Context;
+
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
@@ -24,7 +25,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
     private static final String DB_NAME = "avdhaan_db";
     private static AppDatabase instance;
-    
+
     // Using 2 threads for database operations to ensure good performance
     // across all Android devices while maintaining reasonable resource usage
     private static final int NUMBER_OF_THREADS = 2;

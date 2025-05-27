@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "8d8be054fe97ba0e0bf28a08cc40271f",
+    "identityHash": "73a38dd9a3d3a3b9bfaea1f36a2b8690",
     "entities": [
       {
         "tableName": "app_usage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `packageName` TEXT, `usageTimeMillis` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `packageName` TEXT, `usageTimeMillis` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `duringFocus` INTEGER NOT NULL, `openAttempts` INTEGER NOT NULL, `isBlocked` INTEGER NOT NULL, `isInSchedule` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -29,6 +29,30 @@
           {
             "fieldPath": "timestamp",
             "columnName": "timestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "duringFocus",
+            "columnName": "duringFocus",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "openAttempts",
+            "columnName": "openAttempts",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isBlocked",
+            "columnName": "isBlocked",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isInSchedule",
+            "columnName": "isInSchedule",
             "affinity": "INTEGER",
             "notNull": true
           }
@@ -166,7 +190,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8d8be054fe97ba0e0bf28a08cc40271f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '73a38dd9a3d3a3b9bfaea1f36a2b8690')"
     ]
   }
 }

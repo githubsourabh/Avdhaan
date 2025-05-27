@@ -83,6 +83,15 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
         holder.appName.setText(appName);
         holder.usageDuration.setText(formatDuration(usage.usageTimeMillis));
         holder.appIcon.setImageDrawable(icon);
+
+        // Show focus mode information
+        if (usage.duringFocus && usage.isBlocked && usage.isInSchedule) {
+            holder.focusInfo.setVisibility(View.VISIBLE);
+            holder.focusInfo.setText(String.format("⚠️ Blocked (%d attempts)", usage.openAttempts));
+            holder.focusInfo.setTextColor(context.getResources().getColor(android.R.color.holo_red_dark));
+        } else {
+            holder.focusInfo.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -94,12 +103,14 @@ public class AppUsageAdapter extends RecyclerView.Adapter<AppUsageAdapter.ViewHo
         ImageView appIcon;
         TextView appName;
         TextView usageDuration;
+        TextView focusInfo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             appIcon = itemView.findViewById(R.id.imageViewAppIcon);
             appName = itemView.findViewById(R.id.textViewAppName);
             usageDuration = itemView.findViewById(R.id.textViewDuration);
+            focusInfo = itemView.findViewById(R.id.textViewFocusInfo);
         }
     }
 

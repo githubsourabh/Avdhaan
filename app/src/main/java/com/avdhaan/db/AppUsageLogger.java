@@ -3,25 +3,36 @@ package com.avdhaan.db;
 import android.app.usage.UsageEvents;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.util.Log;
 import android.app.AppOpsManager;
 import com.avdhaan.UsageTrackingPreferences;
+import com.avdhaan.schedule.ScheduleUtils;
+
+//import com.avdhaan.schedule.ScheduleUtils;
+
+//import com.avdhaan.schedule.ScheduleUtils;
+
+//import com.avdhaan.schedule.ScheduleUtils;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import static com.avdhaan.PreferenceConstants.KEY_FOCUS_MODE;
+import static com.avdhaan.PreferenceConstants.PREF_NAME;
+
 public class AppUsageLogger {
 
     private static final String TAG = "AppUsageLogger";
-    private static final long MIN_USAGE_THRESHOLD_MS = 1000; // 1 second
+    private static final long MIN_USAGE_THRESHOLD_MS = 1000;
     private final ExecutorService executor;
     private volatile boolean isShutdown = false;
 
@@ -75,18 +86,20 @@ public class AppUsageLogger {
             return;
         }
 
+        SharedPreferences prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        boolean isFocusMode = prefs.getBoolean(KEY_FOCUS_MODE, false);
+        Set<String> blockedApps = prefs.getStringSet("blocked_apps", new HashSet<>());
+
         UsageEvents.Event event = new UsageEvents.Event();
         AppDatabase db = AppDatabase.getInstance(context);
         Map<String, Long> foregroundTimestamps = new HashMap<>();
+        Map<String, Integer> appAttempts = new HashMap<>();
 
         while (events.hasNextEvent() && !isShutdown) {
             events.getNextEvent(event);
 
             String packageName = event.getPackageName();
-            if (packageName == null) continue;
-
-            // Skip own app
-            if (packageName.equals(context.getPackageName())) continue;
+            if (packageName == null || packageName.equals(context.getPackageName())) continue;
 
             long eventTime = event.getTimeStamp();
             int eventType = event.getEventType();
@@ -94,36 +107,50 @@ public class AppUsageLogger {
             switch (eventType) {
                 case UsageEvents.Event.MOVE_TO_FOREGROUND:
                     foregroundTimestamps.put(packageName, eventTime);
+                    appAttempts.put(packageName, appAttempts.getOrDefault(packageName, 0) + 1);
                     break;
 
                 case UsageEvents.Event.MOVE_TO_BACKGROUND:
                     Long start = foregroundTimestamps.get(packageName);
                     if (start != null) {
-                        processUsageEvent(packageName, start, eventTime, db);
+                        int attempts = appAttempts.getOrDefault(packageName, 1);
+                        boolean isBlocked = blockedApps.contains(packageName);
+                        boolean isInSchedule = ScheduleUtils.isWithinScheduledFocusPeriod(context, packageName);
+                        processUsageEvent(packageName, start, eventTime, db, isFocusMode, attempts, isBlocked, isInSchedule);
                         foregroundTimestamps.remove(packageName);
+                        appAttempts.remove(packageName);
                     }
                     break;
             }
         }
     }
 
-    private void processUsageEvent(String packageName, long startTime, long endTime, AppDatabase db) {
+    private void processUsageEvent(String packageName, long startTime, long endTime,
+                                   AppDatabase db, boolean isFocusMode, int openAttempts,
+                                   boolean isBlocked, boolean isInSchedule) {
+
         long usageDuration = endTime - startTime;
         Long lastLogged = lastLoggedTime.get(packageName);
 
         if (usageDuration >= MIN_USAGE_THRESHOLD_MS &&
-            (lastLogged == null || (endTime - lastLogged) >= MIN_USAGE_THRESHOLD_MS)) {
-            
+                (lastLogged == null || (endTime - lastLogged) >= MIN_USAGE_THRESHOLD_MS)) {
+
             try {
                 if (shouldTrackApp(packageName)) {
                     AppUsage usage = new AppUsage(
                             packageName,
                             usageDuration,
-                            endTime
+                            endTime,
+                            isFocusMode,
+                            openAttempts,
+                            isBlocked,
+                            isInSchedule
                     );
                     db.appUsageDao().insert(usage);
                     lastLoggedTime.put(packageName, endTime);
-                    Log.d(TAG, "Inserted usage for " + packageName + ": " + usageDuration);
+                    Log.d(TAG, "Inserted usage for " + packageName + ": " + usageDuration +
+                            "ms, focus=" + isFocusMode + ", attempts=" + openAttempts +
+                            ", blocked=" + isBlocked + ", scheduled=" + isInSchedule);
                 }
             } catch (Exception e) {
                 Log.e(TAG, "Error inserting usage for " + packageName, e);
@@ -132,16 +159,38 @@ public class AppUsageLogger {
     }
 
     private boolean shouldTrackApp(String packageName) {
-        // Check both system permission and user's tracking preference
-        AppOpsManager appOps = (AppOpsManager) context.getSystemService(Context.APP_OPS_SERVICE);
-        int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
-                android.os.Process.myUid(), context.getPackageName());
-        boolean hasPermission = mode == AppOpsManager.MODE_ALLOWED;
-        
-        UsageTrackingPreferences preferences = new UsageTrackingPreferences(context);
-        boolean isTrackingEnabled = preferences.isTrackingEnabled();
-        
-        return hasPermission && isTrackingEnabled;
+        Boolean cached = appCache.get(packageName);
+        if (cached != null) return cached;
+
+        try {
+            ApplicationInfo appInfo = packageManager.getApplicationInfo(packageName, 0);
+
+            // Track the app if any of these conditions are true:
+            // 1. It's not a system app
+            // 2. It's a system app but has been updated (user version installed)
+            // 3. It has a launcher activity (user can open it)
+            // 4. It's categorized as a game
+            boolean shouldTrack = true;
+            if ((appInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
+                boolean isUpdatedSystemApp = (appInfo.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+                boolean hasLauncherActivity = packageManager.getLaunchIntentForPackage(packageName) != null;
+                boolean isGame = (appInfo.category == ApplicationInfo.CATEGORY_GAME);
+
+                // Only filter out system apps that are:
+                // - Not updated by user
+                // - Not launchable
+                // - Not games
+                shouldTrack = isUpdatedSystemApp || hasLauncherActivity || isGame;
+            }
+
+            appCache.put(packageName, shouldTrack);
+            if (!shouldTrack) systemApps.add(packageName);
+            return shouldTrack;
+
+        } catch (PackageManager.NameNotFoundException e) {
+            appCache.put(packageName, true);
+            return true;
+        }
     }
 
     public void shutdown() {
