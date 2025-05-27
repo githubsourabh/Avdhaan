@@ -11,6 +11,7 @@ import com.avdhaan.db.FocusSchedule;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import com.google.android.material.appbar.MaterialToolbar;
 
 public class ScheduleActivity extends BaseScheduleActivity implements ScheduleListAdapter.OnScheduleUpdated {
 
@@ -26,6 +27,13 @@ public class ScheduleActivity extends BaseScheduleActivity implements ScheduleLi
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        });
         setupScheduleList();
     }
 

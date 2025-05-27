@@ -1,5 +1,6 @@
 package com.avdhaan;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,10 +24,10 @@ import com.github.mikephil.charting.data.BarEntry;
 import com.github.mikephil.charting.data.BarDataSet;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.github.mikephil.charting.formatter.PercentFormatter;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.google.android.material.appbar.MaterialToolbar;
 
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 
 import java.util.ArrayList;
@@ -47,6 +48,15 @@ public class AppUsageListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_usage_list);
+
+        // ✅ Setup toolbar with Home navigation
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        });
 
         usageList = findViewById(R.id.recycler_usage_stats);
         usageList.setLayoutManager(new LinearLayoutManager(this));
@@ -116,7 +126,6 @@ public class AppUsageListActivity extends AppCompatActivity {
         pieData.setValueTextSize(12f);
         pieData.setValueFormatter(new PercentFormatter(pieChart));
 
-        // ✅ Format center text as "Total\n1h 23m"
         long totalMinutes = totalMillis / 60000;
         long hours = totalMinutes / 60;
         long minutes = totalMinutes % 60;

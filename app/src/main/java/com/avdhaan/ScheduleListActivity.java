@@ -13,9 +13,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.avdhaan.db.AppDatabase;
 import com.avdhaan.db.FocusSchedule;
+import com.google.android.material.appbar.MaterialToolbar;
 
 import java.util.List;
 import java.util.concurrent.ExecutorService;
+import com.google.android.material.appbar.MaterialToolbar;
 
 public class ScheduleListActivity extends AppCompatActivity {
 
@@ -29,6 +31,14 @@ public class ScheduleListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_schedule_list);
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setNavigationOnClickListener(v -> {
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        });
 
         scheduleList = findViewById(R.id.schedule_list);
         Button addScheduleButton = findViewById(R.id.btn_add_schedule);
