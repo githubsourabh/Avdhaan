@@ -74,7 +74,9 @@ public class ScheduleListAdapter extends RecyclerView.Adapter<ScheduleListAdapte
         String time = formatTime(schedule.getStartHour(), schedule.getStartMinute()) +
                 " - " +
                 formatTime(schedule.getEndHour(), schedule.getEndMinute());
-        holder.scheduleText.setText(day + " " + time);
+        
+        holder.dayName.setText(day);
+        holder.scheduleText.setText(time);
 
         holder.editButton.setOnClickListener(v -> callback.onEdit(position));
         holder.deleteButton.setOnClickListener(v -> callback.onDelete(position));
