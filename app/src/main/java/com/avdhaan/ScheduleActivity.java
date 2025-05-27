@@ -5,6 +5,7 @@ import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import android.widget.TextView;
 
 import com.avdhaan.db.AppDatabase;
 import com.avdhaan.db.FocusSchedule;
@@ -28,7 +29,15 @@ public class ScheduleActivity extends BaseScheduleActivity implements ScheduleLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        TextView titleText = findViewById(R.id.titleText);
         setSupportActionBar(toolbar);
+        
+        // Set title based on whether we're editing or adding
+        int editScheduleIndex = getIntent().getIntExtra("editScheduleIndex", -1);
+        String title = editScheduleIndex == -1 ? getString(R.string.add_schedule) : getString(R.string.edit_schedule);
+        toolbar.setTitle(title);
+        titleText.setText(title);
+        
         toolbar.setNavigationOnClickListener(v -> {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);

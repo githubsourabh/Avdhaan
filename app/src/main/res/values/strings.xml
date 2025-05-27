@@ -153,6 +153,8 @@
     <string name="repeat_days">Repeat on</string>
 
     <string name="manage_schedules">Manage Schedules</string>
+    <string name="add_schedule">Add Schedule</string>
+    <string name="edit_schedule">Edit Schedule</string>
     <string name="set_your_focus_schedule">Set Your Focus Schedule</string>
     <string name="save_schedule">Save Schedule</string>
     <string name="next">Next</string>

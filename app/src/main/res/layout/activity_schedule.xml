@@ -11,14 +11,15 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:title="Edit Schedules"
+        android:title="@string/add_schedule"
         android:titleTextColor="@android:color/white"
         app:navigationIcon="@drawable/ic_home" />
 
     <TextView
+        android:id="@+id/titleText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/manage_schedules"
+        android:text="@string/add_schedule"
         android:textSize="24sp"
         android:textStyle="bold"
         android:layout_marginBottom="24dp"/>
