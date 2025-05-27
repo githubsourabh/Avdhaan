@@ -170,4 +170,8 @@
     <string name="congratulations_after_schedule_title">Congratulations!</string>
     <string name="congratulations_after_schedule_message">You have started the journey to achieve higher productivity. You are being redirected to the homepage where you can review and update your current selections.</string>
 
+    <string-array name="time_range_options">
+        <item>Today</item>
+        <item>Past 7 Days</item>
+    </string-array>
 </resources>

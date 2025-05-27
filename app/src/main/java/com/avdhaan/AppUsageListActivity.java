@@ -1,74 +1,76 @@
 package com.avdhaan;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TextView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.avdhaan.db.AppDatabase;
-import com.avdhaan.db.AppUsage;
+import com.avdhaan.db.AppUsageSummary;
+import com.avdhaan.viewmodel.DashboardViewModel;
 
-import java.util.List;
-import java.util.concurrent.ExecutorService;
+import java.util.ArrayList;
 
 public class AppUsageListActivity extends AppCompatActivity {
 
-    private RecyclerView recyclerView;
+    private DashboardViewModel viewModel;
+    private AppUsageSummaryAdapter adapter;
+    private Spinner timeRangeSpinner;
+    private Switch blockedToggle;
     private TextView emptyView;
-    private final ExecutorService executor = AppDatabase.databaseWriteExecutor;
+    private RecyclerView usageList;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_app_usage_list);
 
-        recyclerView = findViewById(R.id.recyclerViewAppUsage);
+        usageList = findViewById(R.id.recycler_usage_stats);
+        usageList.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new AppUsageSummaryAdapter(new ArrayList<>(), getPackageManager());
+        usageList.setAdapter(adapter);
+
         emptyView = findViewById(R.id.emptyView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        timeRangeSpinner = findViewById(R.id.spinner_time_range);
+        blockedToggle = findViewById(R.id.switch_focus_blocked_only);
 
-        loadUsageLogs();
-    }
+        viewModel = new ViewModelProvider(this).get(DashboardViewModel.class);
 
-    private void loadUsageLogs() {
-        executor.execute(() -> {
-            try {
-                AppDatabase db = AppDatabase.getInstance(this);
-                List<AppUsage> logs = db.appUsageDao().getRecentLogs(100);
-                Log.d("AppUsageList", "Logs found: " + logs.size());
-
-                if (!isFinishing()) {
-                    runOnUiThread(() -> {
-                        if (logs.isEmpty()) {
-                            recyclerView.setVisibility(View.GONE);
-                            emptyView.setVisibility(View.VISIBLE);
-                        } else {
-                            recyclerView.setVisibility(View.VISIBLE);
-                            emptyView.setVisibility(View.GONE);
-                            AppUsageAdapter adapter = new AppUsageAdapter(this, logs);
-                            recyclerView.setAdapter(adapter);
-                        }
-                    });
-                }
-            } catch (Exception e) {
-                Log.e("AppUsageList", "Error loading usage logs", e);
-                if (!isFinishing()) {
-                    runOnUiThread(() -> {
-                        recyclerView.setVisibility(View.GONE);
-                        emptyView.setVisibility(View.VISIBLE);
-                    });
-                }
+        viewModel.getUsageSummaryLiveData().observe(this, summaries -> {
+            adapter.updateData(summaries);
+            if (summaries == null || summaries.isEmpty()) {
+                emptyView.setVisibility(View.VISIBLE);
+                usageList.setVisibility(View.GONE);
+            } else {
+                emptyView.setVisibility(View.GONE);
+                usageList.setVisibility(View.VISIBLE);
             }
         });
+
+        // Spinner selection changes
+        timeRangeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                loadSummaryFromFilters();
+            }
+            public void onNothingSelected(AdapterView<?> parent) { }
+        });
+
+        // Toggle changes
+        blockedToggle.setOnCheckedChangeListener((buttonView, isChecked) -> loadSummaryFromFilters());
+
+        // Initial load (Today, all apps)
+        loadSummaryFromFilters();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Don't shutdown the executor as it's shared across the app
+    private void loadSummaryFromFilters() {
+        int daysBack = timeRangeSpinner.getSelectedItemPosition() == 1 ? 7 : 0;  // 0 = Today, 1 = 7 days
+        boolean onlyBlocked = blockedToggle.isChecked();
+        viewModel.loadUsageSummary(daysBack, onlyBlocked);
     }
 }
