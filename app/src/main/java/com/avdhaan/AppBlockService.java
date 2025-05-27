@@ -2,19 +2,18 @@ package com.avdhaan;
 
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
 import com.avdhaan.db.AppDatabase;
-import com.avdhaan.db.BlockedApp;
+import com.avdhaan.db.AppUsage;
 import com.avdhaan.db.BlockedAppDao;
 import com.avdhaan.db.FocusSchedule;
 import com.avdhaan.db.FocusScheduleDao;
 
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -29,7 +28,7 @@ public class AppBlockService extends AccessibilityService {
     public void onCreate() {
         super.onCreate();
         executorService = Executors.newSingleThreadExecutor();
-        AppDatabase db = AppDatabase.getInstance(getApplicationContext());
+        AppDatabase db = AppDatabase.getInstance(this);
         blockedAppDao = db.blockedAppDao();
         scheduleDao = db.focusScheduleDao();
     }
@@ -38,26 +37,38 @@ public class AppBlockService extends AccessibilityService {
     public void onAccessibilityEvent(AccessibilityEvent event) {
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
 
-        final CharSequence packageName = event.getPackageName();
-        if (packageName == null) return;
+        CharSequence packageNameCS = event.getPackageName();
+        if (packageNameCS == null) return;
+        String packageName = packageNameCS.toString();
 
         executorService.execute(() -> {
             try {
-                List<BlockedApp> blockedApps = blockedAppDao.getAllBlockedApps();
-                boolean isBlocked = false;
-                for (BlockedApp app : blockedApps) {
-                    if (packageName.toString().equals(app.getPackageName())) {
-                        isBlocked = true;
-                        break;
-                    }
-                }
+                boolean isBlocked = blockedAppDao.getBlockedApp(packageName) != null;
+                Log.d(TAG, "Package checked: " + packageName + " | isBlocked: " + isBlocked);
 
                 if (isBlocked && isWithinFocusTime()) {
                     Log.d(TAG, "Blocked app launched during focus time: " + packageName);
+
+                    // Launch block screen
                     Intent intent = new Intent(this, BlockScreenActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(intent);
+
+                    // Log blocked attempt
+                    AppUsage entry = new AppUsage(
+                            packageName,
+                            0, // usageTimeMillis
+                            System.currentTimeMillis(),
+                            true, // duringFocus
+                            1,    // openAttempts
+                            true, // isBlocked
+                            true  // isInSchedule
+                    );
+
+                    AppDatabase.getInstance(getApplicationContext()).appUsageDao().insert(entry);
+                    Log.d(TAG, "Blocked usage attempt logged for: " + packageName);
                 }
+
             } catch (Exception e) {
                 Log.e(TAG, "Error in accessibility event handling", e);
             }

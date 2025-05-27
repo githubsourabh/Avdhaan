@@ -29,4 +29,7 @@ public interface BlockedAppDao {
 
     @Query("SELECT EXISTS(SELECT 1 FROM blocked_apps WHERE packageName = :packageName)")
     boolean isBlocked(String packageName);
+
+    @Query("SELECT * FROM blocked_apps WHERE packageName = :packageName LIMIT 1")
+    BlockedApp getBlockedApp(String packageName);
 }
