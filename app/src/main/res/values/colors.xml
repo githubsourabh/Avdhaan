@@ -2,5 +2,13 @@
     <color name="purple_500">#6200EE</color>
     <color name="purple_700">#3700B3</color>
     <color name="teal_200">#03DAC5</color>
+
+    // Vedic theme colors
+    <color name="vedic_primary">#D4AF37</color> <!-- gold -->
+    <color name="vedic_secondary">#E2B659</color> <!-- turmeric -->
+    <color name="vedic_background">#FFFBEA</color> <!-- pale sandalwood -->
+    <color name="vedic_accent">#A0522D</color> <!-- earthy brown -->
+    <color name="vedic_text_primary">#3E2723</color> <!-- deep brown -->
+    <color name="vedic_card_bg">#FFF3CD</color> <!-- muted parchment -->
 </resources>
 

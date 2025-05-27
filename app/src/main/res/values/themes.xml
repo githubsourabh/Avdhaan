@@ -9,5 +9,15 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
     </style>
+
+    //Vedic theme styles
+    <style name="Theme.Avdhaan.Vedic" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/vedic_primary</item>
+        <item name="colorOnPrimary">@color/vedic_text_primary</item>
+        <item name="colorSecondary">@color/vedic_secondary</item>
+        <item name="android:windowBackground">@color/vedic_background</item>
+        <item name="android:textColor">@color/vedic_text_primary</item>
+        <item name="android:fontFamily">@font/mukta_regular</item>
+    </style>
 </resources>
 
