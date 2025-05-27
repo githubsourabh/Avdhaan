@@ -59,13 +59,9 @@ public class ScheduleActivity extends BaseScheduleActivity implements ScheduleLi
 
     @Override
     public void onEdit(int position) {
-        executor.execute(() -> {
-            List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-            if (position >= 0 && position < schedules.size()) {
-                FocusSchedule schedule = schedules.get(position);
-                // TODO: Implement edit functionality
-            }
-        });
+        Intent intent = new Intent(this, ScheduleActivity.class);
+        intent.putExtra("editScheduleIndex", position);
+        startActivity(intent);
     }
 
     @Override

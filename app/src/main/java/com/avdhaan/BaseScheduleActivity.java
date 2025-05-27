@@ -217,7 +217,11 @@ public abstract class BaseScheduleActivity extends AppCompatActivity {
         int start1 = startHour * 60 + startMinute;
         int end1 = endHour * 60 + endMinute;
 
-        for (FocusSchedule existing : schedules) {
+        for (int i = 0; i < schedules.size(); i++) {
+            // Skip the schedule being edited
+            if (i == editingScheduleIndex) continue;
+            
+            FocusSchedule existing = schedules.get(i);
             if (existing.getDayOfWeek() != dayOfWeek) continue;
 
             int start2 = existing.getStartHour() * 60 + existing.getStartMinute();
