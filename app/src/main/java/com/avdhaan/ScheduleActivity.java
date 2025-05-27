@@ -53,7 +53,10 @@ public class ScheduleActivity extends BaseScheduleActivity implements ScheduleLi
     protected void onScheduleSaved() {
         executor.execute(() -> {
             List<FocusSchedule> schedules = ScheduleStorage.loadSchedules(this);
-            runOnUiThread(() -> adapter.updateSchedules(schedules));
+            runOnUiThread(() -> {
+                adapter.updateSchedules(schedules);
+                finish();
+            });
         });
     }
 
