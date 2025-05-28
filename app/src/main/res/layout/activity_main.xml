@@ -1,84 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:background="?android:attr/windowBackground"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:gravity="center"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.cardview.widget.CardView
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp">
+        android:layout_height="match_parent"
+        android:src="@drawable/vedic_arjuna_watermark"
+        android:scaleType="fitXY"
+        android:alpha="0.35"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no" />
 
-        <LinearLayout
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center">
+
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
+            android:layout_marginBottom="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/usage_tracking_title"
-                android:textSize="18sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/usage_tracking_description"
-                android:textColor="?android:textColorSecondary"/>
-
-            <Switch
-                android:id="@+id/switch_usage_tracking"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="@string/usage_tracking_switch"/>
+                android:orientation="vertical"
+                android:padding="16dp">
 
-        </LinearLayout>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/usage_tracking_title"
+                    android:textSize="18sp"
+                    android:textStyle="bold"/>
 
-    </androidx.cardview.widget.CardView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/usage_tracking_description"
+                    android:textColor="?android:textColorSecondary"/>
 
-    <TextView
-        android:text="@string/WELCOME_MSG"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="20sp"
-        android:layout_marginBottom="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+                <Switch
+                    android:id="@+id/switch_usage_tracking"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:text="@string/usage_tracking_switch"/>
 
-    <Switch
-        android:id="@+id/focus_swtich"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/SWITCH_FOCUS_MODE"
-        android:layout_marginBottom="24dp"
-        android:textSize="16sp" />
+            </LinearLayout>
 
-    <Button
-        android:id="@+id/schedule_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/BTN_SET_FOCUS_SCH"
-        android:layout_marginTop="24dp"/>
+        </androidx.cardview.widget.CardView>
 
-    <Button
-        android:id="@+id/btn_select_apps"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/BTN_SELECT_APPS_TO_BLK"
-        android:layout_marginTop="24dp"/>
+        <TextView
+            android:text="@string/WELCOME_MSG"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="20sp"
+            android:layout_marginBottom="16dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
 
-    <Button
-        android:id="@+id/btn_view_usage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="View Usage Logs" />
+        <Switch
+            android:id="@+id/focus_swtich"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/SWITCH_FOCUS_MODE"
+            android:layout_marginBottom="24dp"
+            android:textSize="16sp" />
 
+        <Button
+            android:id="@+id/schedule_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/BTN_SET_FOCUS_SCH"
+            android:layout_marginTop="24dp"/>
 
-</LinearLayout>
+        <Button
+            android:id="@+id/btn_select_apps"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/BTN_SELECT_APPS_TO_BLK"
+            android:layout_marginTop="24dp"/>
+
+        <Button
+            android:id="@+id/btn_view_usage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="View Usage Logs" />
+
+    </LinearLayout>
+
+</FrameLayout>
