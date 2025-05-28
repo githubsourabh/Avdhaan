@@ -61,7 +61,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Usage Tracking"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:track="@drawable/switch_track_border" />
 
                 <ImageView
                     android:id="@+id/info_usage_tracking"
@@ -84,7 +85,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/SWITCH_FOCUS_MODE"
-                    android:textSize="16sp" />
+                    android:textSize="16sp"
+                    android:track="@drawable/switch_track_border" />
 
                 <ImageView
                     android:id="@+id/info_focus_mode"
