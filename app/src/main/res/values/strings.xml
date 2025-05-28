@@ -38,7 +38,7 @@
     <string name="skip_access">Skip for Now</string>
 
     <string name="congrats_title">Great!</string>
-    <string name="congrats_message">You\'re almost ready. Now select the apps you want to restrict.</string>
+    <string name="congrats_message">Congratulations on beginning your journey to add productive hours to your day.\nYou\'re just a few steps away from taking back control of your digital time.</string>
     <string name="select_apps">Select Apps</string>
 
     <string name="schedule_prompt_title">Set Your Schedule</string>
@@ -86,6 +86,7 @@
     <string name="SWITCH_FOCUS_MODE">Focus Mode</string>
     <string name="BTN_SET_FOCUS_SCH">Set Focus Schedule</string>
     <string name="BTN_SELECT_APPS_TO_BLK">Select Apps to Block</string>
+    <string name="BTN_VIEW_USAGE">Usage Analysis</string>
 
     <!-- Schedule Activity -->
     <string name="TXTVIEW_START_TIME">Start Time</string>
@@ -179,4 +180,8 @@
 
     <string name="usage_tracking_tooltip">Allows Avdhāan to monitor app usage and focus patterns to guide your mindful habits.</string>
     <string name="focus_mode_tooltip">Blocks selected apps during scheduled times to help you stay focused and distraction-free.</string>
+
+    <string name="sanskrit_title">अवधान</string>
+    <string name="sanskrit_meaning">Derived from the Sanskrit word \"अवधान\" (Avadhāna) meaning attention, focus, or mental presence. Avdhāan is rooted in ancient Indian traditions that trained the mind to stay centered and undistracted.</string>
+    <string name="app_description">In today\'s world of constant digital noise, Avdhāan helps you reclaim your time, block interruptions, and cultivate intentional focus.</string>
 </resources>

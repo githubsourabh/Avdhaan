@@ -115,7 +115,7 @@
                 android:id="@+id/btn_view_usage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="View Usage Logs"
+                android:text="@string/BTN_VIEW_USAGE"
                 android:layout_marginBottom="24dp"/>
 
         </LinearLayout>
