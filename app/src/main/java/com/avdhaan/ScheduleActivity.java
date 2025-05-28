@@ -29,7 +29,7 @@ public class ScheduleActivity extends BaseScheduleActivity implements ScheduleLi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         MaterialToolbar toolbar = findViewById(R.id.toolbar);
-        TextView titleText = findViewById(R.id.titleText);
+        TextView titleText = findViewById(R.id.titleTextView);
         setSupportActionBar(toolbar);
         
         // Set title based on whether we're editing or adding
