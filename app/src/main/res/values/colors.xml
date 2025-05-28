@@ -10,5 +10,6 @@
     <color name="vedic_accent">#A0522D</color> <!-- earthy brown -->
     <color name="vedic_text_primary">#3E2723</color> <!-- deep brown -->
     <color name="vedic_card_bg">#FFF3CD</color> <!-- muted parchment -->
+    <color name="watermark_background">#D6B57F</color>
 </resources>
 

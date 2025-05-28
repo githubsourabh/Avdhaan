@@ -107,12 +107,5 @@
         android:text="@string/save_schedule"
         android:layout_marginTop="24dp"/>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/scheduleList"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:layout_marginTop="24dp"/>
-
 </LinearLayout>
 
