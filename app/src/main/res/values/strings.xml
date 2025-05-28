@@ -33,7 +33,9 @@
     <string name="get_started">Get Started</string>
 
     <string name="grant_accessibility_title">Grant Accessibility Access</string>
-    <string name="grant_accessibility_message">To help you stay focused, we need accessibility access to monitor and block distracting apps. This permission is essential for the app to work properly.</string>
+    <string name="grant_accessibility_message">To help you stay focused, Avdhāan needs accessibility permission.
+This allows the app to detect and block distracting apps during your focus sessions.
+We only use this permission to support your goals—nothing more.</string>
     <string name="grant_access">Grant Access</string>
     <string name="skip_access">Skip for Now</string>
 

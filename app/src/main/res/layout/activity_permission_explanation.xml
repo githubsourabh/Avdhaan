@@ -1,41 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textViewTitle"
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:layout_marginBottom="16dp"
-        android:text="@string/grant_accessibility_title"
-        android:textSize="24sp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:src="@drawable/accessibility_watermark"
+        android:scaleType="fitXY"
+        android:alpha="0.35"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no" />
 
-    <TextView
-        android:id="@+id/textViewMessage"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="@string/grant_accessibility_message"
-        android:textSize="16sp" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center">
 
-    <Button
-        android:id="@+id/buttonGrantAccess"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:text="@string/grant_access" />
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/grant_accessibility_title"
+            android:textSize="32sp"
+            android:fontFamily="@font/mukta_regular"
+            android:textColor="@color/vedic_primary"
+            android:textStyle="bold"
+            android:layout_marginBottom="24dp"/>
 
-    <Button
-        android:id="@+id/buttonSkipAccess"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"
-        android:text="@string/skip_access"
-        style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+        <TextView
+            android:id="@+id/messageTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/grant_accessibility_message"
+            android:textSize="18sp"
+            android:fontFamily="@font/mukta_regular"
+            android:textColor="@color/vedic_text_primary"
+            android:lineSpacingExtra="4dp"
+            android:gravity="center"
+            android:layout_marginBottom="32dp"/>
 
-</LinearLayout> 
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <Button
+                android:id="@+id/grantAccessButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/grant_access"
+                android:layout_marginEnd="16dp"
+                android:backgroundTint="@color/vedic_primary"
+                android:textColor="@android:color/white"/>
+
+            <Button
+                android:id="@+id/skipButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/skip_access"
+                android:backgroundTint="@color/vedic_secondary"
+                android:textColor="@color/vedic_text_primary"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout> 
