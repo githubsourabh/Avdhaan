@@ -13,6 +13,7 @@ import android.os.Looper;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
@@ -52,6 +53,18 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Initialize info icons
+        ImageView infoUsageTracking = findViewById(R.id.info_usage_tracking);
+        ImageView infoFocusMode = findViewById(R.id.info_focus_mode);
+
+        infoUsageTracking.setOnClickListener(v -> {
+            Toast.makeText(this, getString(R.string.usage_tracking_tooltip), Toast.LENGTH_LONG).show();
+        });
+
+        infoFocusMode.setOnClickListener(v -> {
+            Toast.makeText(this, getString(R.string.focus_mode_tooltip), Toast.LENGTH_LONG).show();
+        });
 
         permissionManager = new PermissionManager(getApplicationContext());
         trackingPreferences = new UsageTrackingPreferences(getApplicationContext());

@@ -176,4 +176,7 @@
         <item>Today</item>
         <item>Past 7 Days</item>
     </string-array>
+
+    <string name="usage_tracking_tooltip">Allows Avdhāan to monitor app usage and focus patterns to guide your mindful habits.</string>
+    <string name="focus_mode_tooltip">Blocks selected apps during scheduled times to help you stay focused and distraction-free.</string>
 </resources>
