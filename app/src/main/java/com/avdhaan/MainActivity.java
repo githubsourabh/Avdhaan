@@ -59,11 +59,19 @@ public class MainActivity extends AppCompatActivity {
         ImageView infoFocusMode = findViewById(R.id.info_focus_mode);
 
         infoUsageTracking.setOnClickListener(v -> {
-            Toast.makeText(this, getString(R.string.usage_tracking_tooltip), Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this)
+                .setTitle("Usage Tracking")
+                .setMessage(getString(R.string.usage_tracking_tooltip))
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
         });
 
         infoFocusMode.setOnClickListener(v -> {
-            Toast.makeText(this, getString(R.string.focus_mode_tooltip), Toast.LENGTH_LONG).show();
+            new AlertDialog.Builder(this)
+                .setTitle("Focus Mode")
+                .setMessage(getString(R.string.focus_mode_tooltip))
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
         });
 
         permissionManager = new PermissionManager(getApplicationContext());
