@@ -130,8 +130,8 @@ We only use this permission to support your goals—nothing more.</string>
     <string name="tracking_enabled">Usage tracking enabled</string>
     <string name="tracking_disabled">Usage tracking disabled</string>
     <string name="open_settings">Open Settings</string>
-    <string name="usage_access_required_title">Usage Access Required</string>
-    <string name="usage_access_required_message">Please grant usage access to continue</string>
+    <string name="usage_access_required_title">Usage Access</string>
+    <string name="usage_access_required_message">Thank you for granting Accessibility access.\n\n You\'re one step closer to building deeper focus.\n\nNext, let\'s enable Usage Access.\nThis will allow Avdhāan to monitor how much time you spend on various apps and provide meaningful insights to help you improve your productivity.\n\nStay in control — we\'re here to support your mindful digital journey.</string>
     <string name="blocked_apps_updated">Blocked apps updated</string>
 
     <!-- Schedule Validation -->
