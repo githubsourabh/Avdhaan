@@ -112,13 +112,7 @@ public class ScheduleSetupActivity extends BaseScheduleActivity {
                             ", End=" + schedule.getEndHour() + ":" + schedule.getEndMinute());
                 }
                 
-                // Navigate to congratulations screen if we have schedules
-                if (schedules.size() > 0) {
-                    Intent intent = new Intent(this, OnboardingCongratulationsAfterSchedule.class);
-                    startActivity(intent);
-                    finish();
-                }
-            });
+             });
         });
     }
 
