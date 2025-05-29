@@ -149,7 +149,7 @@ We only use this permission to support your goals—nothing more.</string>
     <string name="button_deselect_all">Deselect All</string>
     <string name="button_proceed_without_selection">Proceed without App Selection</string>
     <string name="dialog_proceed_without_selection_title">Warning</string>
-    <string name="dialog_proceed_without_selection_message">You should select apps for which you want to limit usage. To go back close the window. To continue without selection press Continue.</string>
+    <string name="dialog_proceed_without_selection_message">You should select apps for which you want to limit usage. To go back, press Cancel. To continue without selection press Continue.</string>
     <string name="dialog_continue">Continue</string>
     <string name="start_time">Start Time</string>
     <string name="end_time">End Time</string>
@@ -186,4 +186,9 @@ We only use this permission to support your goals—nothing more.</string>
     <string name="sanskrit_title">अवधान</string>
     <string name="sanskrit_meaning">Derived from the Sanskrit word \"अवधान\" (Avadhāna) meaning attention, focus, or mental presence. Avdhāan is rooted in ancient Indian traditions that trained the mind to stay centered and undistracted.</string>
     <string name="app_description">In today\'s world of constant digital noise, Avdhāan helps you reclaim your time, block interruptions, and cultivate intentional focus.</string>
+
+    <string name="access_denied_title">You\'re in control - and we\'re here when you\'re ready.</string>
+    <string name="access_denied_subtitle">We understand you chose not to grant Accessibility access right now. You can always update your permissions from the home screen.</string>
+    <string name="access_denied_usage_request">To continue your journey with Avdhāan, we now request Usage Access.</string>
+    <string name="access_denied_usage_description">This permission helps us track which apps you use - without reading personal content - so we can offer you meaningful insights and help you build better focus habits.</string>
 </resources>
