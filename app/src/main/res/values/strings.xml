@@ -159,6 +159,7 @@ We only use this permission to support your goals—nothing more.</string>
     <string name="add_schedule">Add Schedule</string>
     <string name="edit_schedule">Edit Schedule</string>
     <string name="set_your_focus_schedule">Set Your Focus Schedule</string>
+    <string name="schedule_setup_description">Add one or more schedules during which your selected apps will be blocked to help you stay focused.</string>
     <string name="save_schedule">Save Schedule</string>
     <string name="next">Next</string>
 
