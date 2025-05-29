@@ -193,4 +193,5 @@ We only use this permission to support your goals—nothing more.</string>
     <string name="access_denied_usage_request">To continue your journey with Avdhāan, we now request Usage Access.</string>
     <string name="access_denied_usage_description">This permission helps us track which apps you use - without reading personal content - so we can offer you meaningful insights and help you build better focus habits.</string>
     <string name="usage_access_denied_message">We understand you\'re not ready to grant App Usage permission right now.\n\nThis permission helps Avdhāan analyze your app usage patterns and offer personalized insights to boost your focus and productivity.\n\nYou can always enable it later from the home screen.\n\nThe good news? You can still proceed and start using Avdhāan\'s core feature — blocking distracting apps based on the schedule you define.</string>
+    <string name="access_denied_usage_granted_message">Avdhāan will now begin tracking the time you spend on different apps. You\'ll be able to view your usage patterns and insights anytime from the home screen.</string>
 </resources>

@@ -6,16 +6,21 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/messageText"
-        android:layout_width="0dp"
+        android:id="@+id/text_title"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:gravity="center"
-        android:text="Will start tracking how much time you are spending on different Apps. You will be able to access usage pattern from Avdhaan's homescreen"
+        android:text="@string/access_denied_usage_granted_message"
         android:textSize="18sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:layout_marginTop="24dp"
+        android:layout_marginBottom="24dp"
+        android:paddingStart="32dp"
+        android:paddingEnd="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <Button
         android:id="@+id/continueButton"
