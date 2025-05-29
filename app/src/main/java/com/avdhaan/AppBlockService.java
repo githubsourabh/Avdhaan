@@ -3,6 +3,7 @@ package com.avdhaan;
 import android.accessibilityservice.AccessibilityService;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.SharedPreferences;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
 
@@ -35,6 +36,16 @@ public class AppBlockService extends AccessibilityService {
 
     @Override
     public void onAccessibilityEvent(AccessibilityEvent event) {
+        // First check if Focus Mode is ON
+        SharedPreferences prefs = getSharedPreferences(PreferenceConstants.PREF_NAME, MODE_PRIVATE);
+        boolean isFocusModeOn = prefs.getBoolean(PreferenceConstants.KEY_FOCUS_MODE, false);
+        
+        // If Focus Mode is OFF, don't do anything
+        if (!isFocusModeOn) {
+            Log.d(TAG, "Focus mode is off, skipping event");
+            return;
+        }
+
         if (event.getEventType() != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return;
 
         CharSequence packageNameCS = event.getPackageName();
