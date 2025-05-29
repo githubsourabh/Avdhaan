@@ -1,37 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
+    <ImageView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/usage_access_required_title"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp"/>
+        android:layout_height="match_parent"
+        android:src="@drawable/usage_access_watermark"
+        android:scaleType="fitXY"
+        android:alpha="0.35"
+        android:contentDescription="@null"
+        android:importantForAccessibility="no" />
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/usage_access_required_message"
-        android:textSize="16sp"
-        android:layout_marginBottom="24dp"/>
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/btn_grant_usage_access"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_grant_usage_access"
-        android:layout_marginBottom="8dp"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/usage_access_required_title"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp"/>
 
-    <Button
-        android:id="@+id/btn_decline_usage_access"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/button_decline_usage_access"
-        style="@style/Widget.Material3.Button.OutlinedButton"/>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/usage_access_required_message"
+            android:textSize="16sp"
+            android:layout_marginBottom="24dp"/>
 
-</LinearLayout> 
+        <Button
+            android:id="@+id/btn_grant_usage_access"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_grant_usage_access"
+            android:layout_marginBottom="8dp"/>
+
+        <Button
+            android:id="@+id/btn_decline_usage_access"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_decline_usage_access"
+            style="@style/Widget.Material3.Button.OutlinedButton"/>
+
+    </LinearLayout>
+</FrameLayout> 

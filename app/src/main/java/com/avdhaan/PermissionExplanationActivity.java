@@ -22,10 +22,10 @@ public class PermissionExplanationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_permission_explanation);
 
-        TextView titleTextView = findViewById(R.id.textViewTitle);
-        TextView messageTextView = findViewById(R.id.textViewMessage);
-        Button buttonGrantAccess = findViewById(R.id.buttonGrantAccess);
-        Button buttonSkipAccess = findViewById(R.id.buttonSkipAccess);
+        TextView titleTextView = findViewById(R.id.titleTextView);
+        TextView messageTextView = findViewById(R.id.messageTextView);
+        Button buttonGrantAccess = findViewById(R.id.grantAccessButton);
+        Button buttonSkipAccess = findViewById(R.id.skipButton);
 
         titleTextView.setText(R.string.grant_accessibility_title);
         messageTextView.setText(R.string.grant_accessibility_message);
