@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import com.google.android.material.appbar.MaterialToolbar;
 
 public class SelectAppsActivity extends AppCompatActivity {
 
@@ -36,6 +36,7 @@ public class SelectAppsActivity extends AppCompatActivity {
     private AppListAdapter adapter;
     private Set<String> blockedApps = new HashSet<>();
     private BlockedAppDao blockedAppDao;
+    private Button saveButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +55,15 @@ public class SelectAppsActivity extends AppCompatActivity {
 
         recyclerView = findViewById(R.id.apps_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
+        saveButton = findViewById(R.id.button_save);
+        saveButton.setOnClickListener(v -> {
+            Toast.makeText(this, "App selections saved", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+            finish();
+        });
 
         loadBlockedAppsAndPopulate();
     }
