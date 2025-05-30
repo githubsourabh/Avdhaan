@@ -27,6 +27,7 @@ public class AppListUtils {
         );
         
         List<AppInfo> userApps = new ArrayList<>();
+        List<AppInfo> updatedSystemApps = new ArrayList<>();
         String currentPackage = context.getPackageName();
 
         for (ApplicationInfo app : installedApps) {
@@ -37,26 +38,45 @@ public class AppListUtils {
 
             // Check if app has a launch intent
             boolean hasLaunchIntent = packageManager.getLaunchIntentForPackage(app.packageName) != null;
+            if (!hasLaunchIntent) {
+                continue;
+            }
             
-            // Include app if:
-            // 1. It's a user-installed app
-            // 2. It has a launch intent
-            boolean isUserApp = (app.flags & ApplicationInfo.FLAG_SYSTEM) == 0;
+            // Check if it's a system app
+            boolean isSystemApp = (app.flags & ApplicationInfo.FLAG_SYSTEM) != 0;
+            boolean isUpdatedSystemApp = (app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
+            
+            // Skip if it's a system app that hasn't been updated
+            if (isSystemApp && !isUpdatedSystemApp) {
+                continue;
+            }
 
-            if (isUserApp || hasLaunchIntent) {
-                String appName = packageManager.getApplicationLabel(app).toString();
-                Drawable icon;
-                try {
-                    icon = packageManager.getApplicationIcon(app);
-                } catch (Exception e) {
-                    Log.e(TAG, "Error getting icon for " + app.packageName, e);
-                    icon = context.getResources().getDrawable(R.mipmap.ic_launcher, context.getTheme());
-                }
-                userApps.add(new AppInfo(appName, app.packageName, icon));
+            String appName = packageManager.getApplicationLabel(app).toString();
+            Drawable icon;
+            try {
+                icon = packageManager.getApplicationIcon(app);
+            } catch (Exception e) {
+                Log.e(TAG, "Error getting icon for " + app.packageName, e);
+                icon = context.getResources().getDrawable(R.mipmap.ic_launcher, context.getTheme());
+            }
+            
+            AppInfo appInfo = new AppInfo(appName, app.packageName, icon);
+            if (!isSystemApp) {
+                userApps.add(appInfo);
+            } else {
+                updatedSystemApps.add(appInfo);
             }
         }
 
+        // Sort each list alphabetically
         Collections.sort(userApps, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
-        return userApps;
+        Collections.sort(updatedSystemApps, (a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+
+        // Combine lists with user apps first
+        List<AppInfo> allApps = new ArrayList<>();
+        allApps.addAll(userApps);
+        allApps.addAll(updatedSystemApps);
+        
+        return allApps;
     }
 } 
