@@ -10,6 +10,20 @@
     <!-- Required to receive BOOT_COMPLETED - MOVED HERE -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
+    <supports-screens
+        android:smallScreens="true"
+        android:normalScreens="true"
+        android:largeScreens="false"
+        android:xlargeScreens="false"
+        android:anyDensity="true" />
+
+    <compatible-screens>
+        <screen android:screenSize="normal" android:screenDensity="hdpi"/>
+        <screen android:screenSize="normal" android:screenDensity="xhdpi"/>
+        <screen android:screenSize="normal" android:screenDensity="xxhdpi"/>
+        <screen android:screenSize="normal" android:screenDensity="xxxhdpi"/>
+    </compatible-screens>
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"

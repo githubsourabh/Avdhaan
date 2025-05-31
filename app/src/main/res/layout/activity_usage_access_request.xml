@@ -44,8 +44,8 @@
             android:id="@+id/btn_decline_usage_access"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/button_decline_usage_access"
-            style="@style/Widget.Material3.Button.OutlinedButton"/>
+            android:text="@string/button_decline_usage_access"/>
+
 
     </LinearLayout>
 </FrameLayout> 

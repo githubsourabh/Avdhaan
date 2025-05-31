@@ -33,10 +33,11 @@
     <string name="get_started">Get Started</string>
 
     <string name="grant_accessibility_title">Grant Accessibility Access</string>
-    <string name="grant_accessibility_message">To help you stay focused, Avdhāan needs accessibility permission.
-This allows the app to detect and block distracting apps during your focus sessions.
-We only use this permission to support your goals—nothing more.</string>
-    <string name="grant_access">Grant Access</string>
+    <string name="grant_accessibility_message">Avdhāan uses the Accessibility Service API to help you stay focused.
+This permission allows us to detect and block distracting apps during your focus sessions.
+We do not collect or share any personal or sensitive data through this service.
+Please tap Continue to proceed to Accessibility settings and enable Avdhāan.</string>
+    <string name="grant_access">Continue</string>
     <string name="skip_access">Skip for Now</string>
 
     <string name="congrats_title">Great!</string>
@@ -68,7 +69,7 @@ We only use this permission to support your goals—nothing more.</string>
     <string name="button_go_to_main">Go to Main</string>
     <string name="button_grant_permission">Grant Permission</string>
     <string name="button_proceed_after_permission">Proceed</string>
-    <string name="button_grant_usage_access">Grant Usage Access</string>
+    <string name="button_grant_usage_access">Continue</string>
     <string name="button_decline_usage_access">No, Thanks</string>
     <string name="button_agree_grant_usage_access">Grant Access</string>
     <string name="button_decline_grant_usage_access">Not Now</string>
@@ -131,7 +132,14 @@ We only use this permission to support your goals—nothing more.</string>
     <string name="tracking_disabled">Usage tracking disabled</string>
     <string name="open_settings">Open Settings</string>
     <string name="usage_access_required_title">Usage Access</string>
-    <string name="usage_access_required_message">Thank you for granting Accessibility access.\n\n You\'re one step closer to building deeper focus.\n\nNext, let\'s enable Usage Access.\nThis will allow Avdhāan to monitor how much time you spend on various apps and provide meaningful insights to help you improve your productivity.\n\nStay in control — we\'re here to support your mindful digital journey.</string>
+    <string name="usage_access_required_message">Thank you for granting Accessibility access.\n\n You\'re one step closer to building deeper focus.\n\nNext, Avdhāan needs Usage Access and App Visibility permissions
+To help you stay focused and break free from distractions, Avdhāan requires the following:
+	•	Usage Access: To monitor how long you use each app and provide usage insights.
+	•	App Visibility (QUERY_ALL_PACKAGES): To show you the full list of installed apps so you can choose which ones to block during focus sessions.
+
+We do not collect or share any of this data externally. Everything stays on your device.
+
+ Tap Continue to grant these permissions and unlock Avdhāan’s features.</string>
     <string name="blocked_apps_updated">Blocked apps updated</string>
 
     <!-- Schedule Validation -->
@@ -190,8 +198,14 @@ We only use this permission to support your goals—nothing more.</string>
 
     <string name="access_denied_title">You\'re in control - and we\'re here when you\'re ready.</string>
     <string name="access_denied_subtitle">We understand you chose not to grant Accessibility access right now. You can always update your permissions from the home screen.</string>
-    <string name="access_denied_usage_request">To continue your journey with Avdhāan, we now request Usage Access.</string>
-    <string name="access_denied_usage_description">This permission helps us track which apps you use - without reading personal content - so we can offer you meaningful insights and help you build better focus habits.</string>
+    <string name="access_denied_usage_request">Next, Avdhāan needs Usage Access and App Visibility permissions</string>
+    <string name="access_denied_usage_description">To help you stay focused and break free from distractions, Avdhāan requires the following:
+	•	Usage Access: To monitor how long you use each app and provide usage insights.
+	•	App Visibility (QUERY_ALL_PACKAGES): To show you the full list of installed apps so you can choose which ones to block during focus sessions.
+
+We do not collect or share any of this data externally. Everything stays on your device.
+
+Tap Continue to grant these permissions and unlock Avdhāan’s features.</string>
     <string name="usage_access_denied_message">We understand you\'re not ready to grant App Usage permission right now.\n\nThis permission helps Avdhāan analyze your app usage patterns and offer personalized insights to boost your focus and productivity.\n\nYou can always enable it later from the home screen.\n\nThe good news? You can still proceed and start using Avdhāan\'s core feature — blocking distracting apps based on the schedule you define.</string>
     <string name="access_denied_usage_granted_message">Avdhāan will now begin tracking the time you spend on different apps. You\'ll be able to view your usage patterns and insights anytime from the home screen.</string>
 </resources>
