@@ -153,20 +153,27 @@ public abstract class BaseScheduleActivity extends AppCompatActivity {
                         return;
                     }
 
-                    // Create new schedule
-                    FocusSchedule schedule = new FocusSchedule();
-                    schedule.setDayOfWeek(selectedDays.get(0)); // Use first selected day
-                    schedule.setStartHour(startHour);
-                    schedule.setStartMinute(startMinute);
-                    schedule.setEndHour(endHour);
-                    schedule.setEndMinute(endMinute);
-                    schedule.setGroupId(1); // Default group
+                    // Create new schedules for each selected day
+                    List<FocusSchedule> newSchedules = new ArrayList<>();
+                    for (int dayOfWeek : selectedDays) {
+                        FocusSchedule schedule = new FocusSchedule();
+                        schedule.setDayOfWeek(dayOfWeek);
+                        schedule.setStartHour(startHour);
+                        schedule.setStartMinute(startMinute);
+                        schedule.setEndHour(endHour);
+                        schedule.setEndMinute(endMinute);
+                        schedule.setGroupId(1); // Default group
+                        newSchedules.add(schedule);
+                    }
 
-                    // Update or add schedule
+                    // Update or add schedules
                     if (editingScheduleIndex >= 0) {
-                        schedules.set(editingScheduleIndex, schedule);
+                        // Remove the old schedule
+                        schedules.remove(editingScheduleIndex);
+                        // Add all new schedules
+                        schedules.addAll(newSchedules);
                     } else {
-                        schedules.add(schedule);
+                        schedules.addAll(newSchedules);
                     }
 
                     // Save to database
